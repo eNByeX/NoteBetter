@@ -1,5 +1,6 @@
 package com.github.soniex2.notebetter.config;
 
+import com.github.soniex2.notebetter.config.util.JsonHelper;
 import com.google.gson.*;
 import net.minecraft.util.JsonUtils;
 
@@ -13,17 +14,20 @@ import java.util.Map;
  * @author soniex2
  */
 public class NoteBetterNoteConfig {
-    static final Gson JSON_ADAPTER = (new GsonBuilder()).registerTypeAdapter(NoteBetterNoteConfig.class, new NoteBetterNoteConfig.Serializer()).create();
-    public String base = "minecraft:note.harp";
+    private static final Gson JSON_ADAPTER = (new GsonBuilder())
+            .registerTypeAdapter(NoteBetterNoteConfig.class, new NoteBetterNoteConfig.Serializer())
+            .setPrettyPrinting()
+            .create();
+    public String base = null;
     public Map<String, String> blocks = new LinkedHashMap<String, String>();
     public List<MaterialSound> materials = new ArrayList<MaterialSound>();
 
-    public static NoteBetterNoteConfig fromJson(String json) {
-        if (json.length() == 0) {
+    public static NoteBetterNoteConfig fromString(String s) {
+        if (s.length() == 0) {
             return new NoteBetterNoteConfig();
         } else {
             try {
-                return JSON_ADAPTER.fromJson(json, NoteBetterNoteConfig.class);
+                return JSON_ADAPTER.fromJson(s, NoteBetterNoteConfig.class);
             } catch (Exception exception) {
                 return new NoteBetterNoteConfig();
             }
@@ -44,14 +48,14 @@ public class NoteBetterNoteConfig {
             JsonObject jsonObject = json.getAsJsonObject();
             NoteBetterNoteConfig config = new NoteBetterNoteConfig();
             try {
-                config.base = JsonUtils.getJsonObjectStringFieldValueOrDefault(jsonObject, "default", "minecraft:note.harp");
+                config.base = JsonHelper.getStringOrNull(jsonObject, "default");
                 JsonArray blocks = jsonObject.has("blocks") ? JsonUtils.getJsonElementAsJsonArray(jsonObject.get("blocks"), "blocks") : null;
                 JsonArray materials = jsonObject.has("materials") ? JsonUtils.getJsonElementAsJsonArray(jsonObject.get("materials"), "materials") : null;
                 if (blocks != null) {
                     for (JsonElement element : blocks) {
                         JsonObject materialObject = JsonUtils.getElementAsJsonObject(element, "blocks");
                         String block = JsonUtils.getJsonObjectStringFieldValue(materialObject, "block");
-                        String sound = JsonUtils.getJsonObjectStringFieldValue(materialObject, "sound");
+                        String sound = JsonHelper.getStringOrNull(materialObject, "sound");
                         config.blocks.put(block, sound);
                     }
                 }
@@ -59,7 +63,7 @@ public class NoteBetterNoteConfig {
                     for (JsonElement element : materials) {
                         JsonObject materialObject = JsonUtils.getElementAsJsonObject(element, "materials");
                         String material_of = JsonUtils.getJsonObjectStringFieldValue(materialObject, "material_of");
-                        String sound = JsonUtils.getJsonObjectStringFieldValue(materialObject, "sound");
+                        String sound = JsonHelper.getStringOrNull(materialObject, "sound");
                         config.materials.add(new MaterialSound(material_of, sound));
                     }
                 } else {
@@ -69,7 +73,6 @@ public class NoteBetterNoteConfig {
                     config.materials.add(new MaterialSound("minecraft:planks", "minecraft:note.bassattack"));
                 }
             } catch (Exception ignore) {
-                ;
             }
             return config;
         }

@@ -191,8 +191,6 @@ public class ObjectConfigElement implements IConfigElement {
 
     /**
      * [Property] Sets this property's value.
-     *
-     * @param value
      */
     @Override
     public void set(Object value) {
@@ -201,8 +199,6 @@ public class ObjectConfigElement implements IConfigElement {
 
     /**
      * [Property] Sets this property's value to the specified array.
-     *
-     * @param aVal
      */
     @Override
     public void set(Object[] aVal) {
