@@ -1,0 +1,16 @@
+[
+{
+  "modid": "notebetter",
+  "name": "NoteBetter",
+  "description": "Better Note Blocks.",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["SoniEx2"],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]

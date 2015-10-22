@@ -1,0 +1,27 @@
+{
+  "blocks": [
+    {
+      "block": "minecraft:stone",
+      "sound": "minecraft:note.bd"
+    }
+  ],
+  "materials": [
+    {
+      "material_of": "minecraft:stone",
+      "sound": "minecraft:note.bd"
+    },
+    {
+      "material_of": "minecraft:sand",
+      "sound": "minecraft:note.snare"
+    },
+    {
+      "material_of": "minecraft:glass",
+      "sound": "minecraft:note.hat"
+    },
+    {
+      "material_of": "minecraft:planks",
+      "sound": "minecraft:note.bassattack"
+    }
+  ],
+  "default": "minecraft:note.harp"
+}
