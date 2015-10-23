@@ -3,6 +3,7 @@ package com.github.soniex2.notebetter.config;
 import com.github.soniex2.notebetter.config.util.JsonHelper;
 import com.google.gson.*;
 import net.minecraft.util.JsonUtils;
+import net.minecraft.util.ResourceLocation;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -18,8 +19,8 @@ public class NoteBetterNoteConfig {
             .registerTypeAdapter(NoteBetterNoteConfig.class, new NoteBetterNoteConfig.Serializer())
             .setPrettyPrinting()
             .create();
-    public String base = null;
-    public Map<String, String> blocks = new LinkedHashMap<String, String>();
+    public ResourceLocation base = null;
+    public Map<ResourceLocation, ResourceLocation> blocks = new LinkedHashMap<ResourceLocation, ResourceLocation>();
     public List<MaterialSound> materials = new ArrayList<MaterialSound>();
 
     public static NoteBetterNoteConfig fromString(String s) {
@@ -48,7 +49,8 @@ public class NoteBetterNoteConfig {
             JsonObject jsonObject = json.getAsJsonObject();
             NoteBetterNoteConfig config = new NoteBetterNoteConfig();
             try {
-                config.base = JsonHelper.getStringOrNull(jsonObject, "default");
+                String baseStr = JsonHelper.getStringOrNull(jsonObject, "default");
+                config.base = baseStr != null ? new ResourceLocation(baseStr) : null;
                 JsonArray blocks = jsonObject.has("blocks") ? JsonUtils.getJsonElementAsJsonArray(jsonObject.get("blocks"), "blocks") : null;
                 JsonArray materials = jsonObject.has("materials") ? JsonUtils.getJsonElementAsJsonArray(jsonObject.get("materials"), "materials") : null;
                 if (blocks != null) {
@@ -56,7 +58,7 @@ public class NoteBetterNoteConfig {
                         JsonObject materialObject = JsonUtils.getElementAsJsonObject(element, "blocks");
                         String block = JsonUtils.getJsonObjectStringFieldValue(materialObject, "block");
                         String sound = JsonHelper.getStringOrNull(materialObject, "sound");
-                        config.blocks.put(block, sound);
+                        config.blocks.put(new ResourceLocation(block), sound != null ? new ResourceLocation(sound) : null);
                     }
                 }
                 if (materials != null) {
@@ -64,13 +66,13 @@ public class NoteBetterNoteConfig {
                         JsonObject materialObject = JsonUtils.getElementAsJsonObject(element, "materials");
                         String material_of = JsonUtils.getJsonObjectStringFieldValue(materialObject, "material_of");
                         String sound = JsonHelper.getStringOrNull(materialObject, "sound");
-                        config.materials.add(new MaterialSound(material_of, sound));
+                        config.materials.add(new MaterialSound(new ResourceLocation(material_of), sound != null ? new ResourceLocation(sound) : null));
                     }
                 } else {
-                    config.materials.add(new MaterialSound("minecraft:stone", "minecraft:note.bd"));
-                    config.materials.add(new MaterialSound("minecraft:sand", "minecraft:note.snare"));
-                    config.materials.add(new MaterialSound("minecraft:glass", "minecraft:note.hat"));
-                    config.materials.add(new MaterialSound("minecraft:planks", "minecraft:note.bassattack"));
+                    config.materials.add(new MaterialSound(new ResourceLocation("minecraft:stone"), new ResourceLocation("minecraft:note.bd")));
+                    config.materials.add(new MaterialSound(new ResourceLocation("minecraft:sand"), new ResourceLocation("minecraft:note.snare")));
+                    config.materials.add(new MaterialSound(new ResourceLocation("minecraft:glass"), new ResourceLocation("minecraft:note.hat")));
+                    config.materials.add(new MaterialSound(new ResourceLocation("minecraft:planks"), new ResourceLocation("minecraft:note.bassattack")));
                 }
             } catch (Exception ignore) {
             }
@@ -84,19 +86,28 @@ public class NoteBetterNoteConfig {
         public JsonElement serialize(Object src, Type typeOfSrc, JsonSerializationContext context) {
             NoteBetterNoteConfig config = (NoteBetterNoteConfig) src;
             JsonObject jsonObject = new JsonObject();
-            jsonObject.addProperty("default", config.base);
+            if (config.base != null)
+                jsonObject.addProperty("default", config.base.toString());
+            else
+                jsonObject.add("default", JsonNull.INSTANCE);
             JsonArray blocks = new JsonArray();
             JsonArray materials = new JsonArray();
             for (MaterialSound sound : config.materials) {
                 JsonObject materialObject = new JsonObject();
-                materialObject.addProperty("material_of", sound.material_of);
-                materialObject.addProperty("sound", sound.sound);
+                materialObject.addProperty("material_of", sound.material_of.toString());
+                if (sound.sound != null)
+                    materialObject.addProperty("sound", sound.sound.toString());
+                else
+                    materialObject.add("sound", JsonNull.INSTANCE);
                 materials.add(materialObject);
             }
-            for (Map.Entry<String, String> sound : config.blocks.entrySet()) {
+            for (Map.Entry<ResourceLocation, ResourceLocation> sound : config.blocks.entrySet()) {
                 JsonObject blockObject = new JsonObject();
-                blockObject.addProperty("material_of", sound.getKey());
-                blockObject.addProperty("sound", sound.getValue());
+                blockObject.addProperty("material_of", sound.getKey().toString());
+                if (sound.getValue() != null)
+                    blockObject.addProperty("sound", sound.getValue().toString());
+                else
+                    blockObject.add("sound", JsonNull.INSTANCE);
                 blocks.add(blockObject);
             }
             jsonObject.add("materials", materials);
@@ -106,10 +117,10 @@ public class NoteBetterNoteConfig {
     }
 
     public static class MaterialSound {
-        public final String material_of;
-        public final String sound;
+        public final ResourceLocation material_of;
+        public final ResourceLocation sound;
 
-        public MaterialSound(String material_of, String sound) {
+        public MaterialSound(ResourceLocation material_of, ResourceLocation sound) {
             this.material_of = material_of;
             this.sound = sound;
         }

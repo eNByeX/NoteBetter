@@ -17,9 +17,9 @@ import net.minecraftforge.event.world.NoteBlockEvent;
  * @author soniex2
  */
 public class NoteMethods {
-    private static NoteBlockEvent.Instrument instrumentFromString(String instrument) {
-        if (instrument.startsWith("minecraft:note.")) {
-            String name = instrument.substring(15); // skip above prefix
+    private static NoteBlockEvent.Instrument instrumentFromResLoc(ResourceLocation instrument) {
+        if (instrument.getResourceDomain().equals("minecraft") && instrument.getResourcePath().startsWith("note.")) {
+            String name = instrument.getResourcePath().substring(5); // skip above prefix
             switch (name.charAt(0)) {
                 case 'h':
                     if (name.equals("harp"))
@@ -42,32 +42,32 @@ public class NoteMethods {
         return null;
     }
 
-    private static String instrumentToString(NoteBlockEvent.Instrument instrument) {
+    private static ResourceLocation instrumentToResLoc(NoteBlockEvent.Instrument instrument) {
         switch (instrument) {
             default:
-                return "minecraft:note.harp";
+                return new ResourceLocation("minecraft:note.harp");
             case BASSDRUM:
-                return "minecraft:note.bd";
+                return new ResourceLocation("minecraft:note.bd");
             case SNARE:
-                return "minecraft:note.snare";
+                return new ResourceLocation("minecraft:note.snare");
             case CLICKS:
-                return "minecraft:note.hat";
+                return new ResourceLocation("minecraft:note.hat");
             case BASSGUITAR:
-                return "minecraft:note.bassattack";
+                return new ResourceLocation("minecraft:note.bassattack");
         }
     }
 
-    private static void playNote(World world, BlockPos pos, String instrument, int note) {
-        NoteBlockEvent.Instrument vanillaInstrument = instrumentFromString(instrument);
+    private static void playNote(World world, BlockPos pos, ResourceLocation instrument, int note) {
+        NoteBlockEvent.Instrument vanillaInstrument = instrumentFromResLoc(instrument);
         if (vanillaInstrument != null) {
             NoteBlockEvent.Play e = new NoteBlockEvent.Play(world, pos, world.getBlockState(pos), note, vanillaInstrument.ordinal());
             if (MinecraftForge.EVENT_BUS.post(e)) return;
             vanillaInstrument = e.instrument;
-            instrument = instrumentToString(vanillaInstrument);
+            instrument = instrumentToResLoc(vanillaInstrument);
             note = e.getVanillaNoteId();
         }
         float pitch = (float) Math.pow(2.0D, (note - 12) / 12.0D);
-        world.playSoundEffect(pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D, instrument, 3.0F, pitch);
+        world.playSoundEffect(pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D, instrument.toString(), 3.0F, pitch);
         if (world instanceof WorldServer) // just in case it *isn't* being called from a WorldServer
             ((WorldServer) world).spawnParticle(EnumParticleTypes.NOTE, false, pos.getX() + 0.5D, pos.getY() + 1.2D, pos.getZ() + 0.5D, 0, ((double) note) / 24.0D, 0.0D, 0.0D, 1.0D);
     }
@@ -79,8 +79,8 @@ public class NoteMethods {
             /* First we do blocks */
             IBlockState bs = world.getBlockState(pos.down());
             ResourceLocation rl = (ResourceLocation) Block.blockRegistry.getNameForObject(bs.getBlock());
-            if (NoteBetter.instance.defaultConfig.blocks.containsKey(rl.toString())) {
-                String sound = NoteBetter.instance.defaultConfig.blocks.get(rl.toString());
+            if (NoteBetter.instance.defaultConfig.blocks.containsKey(rl)) {
+                ResourceLocation sound = NoteBetter.instance.defaultConfig.blocks.get(rl);
                 if (sound == null) return true; // don't play anything
                 playNote(world, pos, sound, te.note);
                 return true;
@@ -89,7 +89,7 @@ public class NoteMethods {
             Material m = world.getBlockState(pos.down()).getBlock().getMaterial();
             for (NoteBetterNoteConfig.MaterialSound ms : NoteBetter.instance.defaultConfig.materials) {
                 if (ms.material_of == null) continue;
-                if (Block.getBlockFromName(ms.material_of).getMaterial() == m) {
+                if (Block.getBlockFromName(ms.material_of.toString()).getMaterial() == m) {
                     if (ms.sound == null) return true; // don't play anything
                     playNote(world, pos, ms.sound, te.note);
                     return true;
