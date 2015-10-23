@@ -1,9 +1,5 @@
 {
   "blocks": [
-    {
-      "block": "minecraft:stone",
-      "sound": "minecraft:note.bd"
-    }
   ],
   "materials": [
     {

@@ -1,6 +1,7 @@
 package com.github.soniex2.notebetter;
 
 import com.github.soniex2.notebetter.config.NoteBetterNoteConfig;
+import com.github.soniex2.notebetter.util.CachedResourceLocation;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -45,15 +46,15 @@ public class NoteMethods {
     private static ResourceLocation instrumentToResLoc(NoteBlockEvent.Instrument instrument) {
         switch (instrument) {
             default:
-                return new ResourceLocation("minecraft:note.harp");
+                return new CachedResourceLocation("minecraft:note.harp");
             case BASSDRUM:
-                return new ResourceLocation("minecraft:note.bd");
+                return new CachedResourceLocation("minecraft:note.bd");
             case SNARE:
-                return new ResourceLocation("minecraft:note.snare");
+                return new CachedResourceLocation("minecraft:note.snare");
             case CLICKS:
-                return new ResourceLocation("minecraft:note.hat");
+                return new CachedResourceLocation("minecraft:note.hat");
             case BASSGUITAR:
-                return new ResourceLocation("minecraft:note.bassattack");
+                return new CachedResourceLocation("minecraft:note.bassattack");
         }
     }
 
@@ -89,7 +90,12 @@ public class NoteMethods {
             Material m = world.getBlockState(pos.down()).getBlock().getMaterial();
             for (NoteBetterNoteConfig.MaterialSound ms : NoteBetter.instance.defaultConfig.materials) {
                 if (ms.material_of == null) continue;
-                if (Block.getBlockFromName(ms.material_of.toString()).getMaterial() == m) {
+                // we already have a ResourceLocation, skip getBlockFromName.
+                Block b = null;
+                if (Block.blockRegistry.containsKey(ms.material_of)) {
+                    b = (Block) Block.blockRegistry.getObject(ms.material_of);
+                }
+                if (b != null && b.getMaterial() == m) {
                     if (ms.sound == null) return true; // don't play anything
                     playNote(world, pos, ms.sound, te.note);
                     return true;

@@ -1,6 +1,7 @@
 package com.github.soniex2.notebetter.config;
 
 import com.github.soniex2.notebetter.config.util.JsonHelper;
+import com.github.soniex2.notebetter.util.CachedResourceLocation;
 import com.google.gson.*;
 import net.minecraft.util.JsonUtils;
 import net.minecraft.util.ResourceLocation;
@@ -50,7 +51,7 @@ public class NoteBetterNoteConfig {
             NoteBetterNoteConfig config = new NoteBetterNoteConfig();
             try {
                 String baseStr = JsonHelper.getStringOrNull(jsonObject, "default");
-                config.base = baseStr != null ? new ResourceLocation(baseStr) : null;
+                config.base = baseStr != null ? new CachedResourceLocation(baseStr) : null;
                 JsonArray blocks = jsonObject.has("blocks") ? JsonUtils.getJsonElementAsJsonArray(jsonObject.get("blocks"), "blocks") : null;
                 JsonArray materials = jsonObject.has("materials") ? JsonUtils.getJsonElementAsJsonArray(jsonObject.get("materials"), "materials") : null;
                 if (blocks != null) {
@@ -58,7 +59,7 @@ public class NoteBetterNoteConfig {
                         JsonObject materialObject = JsonUtils.getElementAsJsonObject(element, "blocks");
                         String block = JsonUtils.getJsonObjectStringFieldValue(materialObject, "block");
                         String sound = JsonHelper.getStringOrNull(materialObject, "sound");
-                        config.blocks.put(new ResourceLocation(block), sound != null ? new ResourceLocation(sound) : null);
+                        config.blocks.put(new CachedResourceLocation(block), sound != null ? new CachedResourceLocation(sound) : null);
                     }
                 }
                 if (materials != null) {
@@ -66,13 +67,8 @@ public class NoteBetterNoteConfig {
                         JsonObject materialObject = JsonUtils.getElementAsJsonObject(element, "materials");
                         String material_of = JsonUtils.getJsonObjectStringFieldValue(materialObject, "material_of");
                         String sound = JsonHelper.getStringOrNull(materialObject, "sound");
-                        config.materials.add(new MaterialSound(new ResourceLocation(material_of), sound != null ? new ResourceLocation(sound) : null));
+                        config.materials.add(new MaterialSound(new CachedResourceLocation(material_of), sound != null ? new CachedResourceLocation(sound) : null));
                     }
-                } else {
-                    config.materials.add(new MaterialSound(new ResourceLocation("minecraft:stone"), new ResourceLocation("minecraft:note.bd")));
-                    config.materials.add(new MaterialSound(new ResourceLocation("minecraft:sand"), new ResourceLocation("minecraft:note.snare")));
-                    config.materials.add(new MaterialSound(new ResourceLocation("minecraft:glass"), new ResourceLocation("minecraft:note.hat")));
-                    config.materials.add(new MaterialSound(new ResourceLocation("minecraft:planks"), new ResourceLocation("minecraft:note.bassattack")));
                 }
             } catch (Exception ignore) {
             }
