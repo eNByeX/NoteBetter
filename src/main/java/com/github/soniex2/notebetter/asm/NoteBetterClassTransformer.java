@@ -1,4 +1,4 @@
-package com.github.soniex2.notebetter;
+package com.github.soniex2.notebetter.asm;
 
 import net.minecraft.launchwrapper.IClassTransformer;
 import org.objectweb.asm.ClassReader;

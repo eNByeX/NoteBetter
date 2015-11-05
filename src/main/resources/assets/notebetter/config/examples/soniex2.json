@@ -11,15 +11,15 @@
   ],
   "materials": [
     {
-      "material_of": "minecraft:iron_block",
+      "material": "minecraft:iron_block",
       "sound": "minecraft:note.pling"
     },
     {
-      "material_of": "minecraft:anvil",
+      "material": "minecraft:anvil",
       "sound": "minecraft:random.anvil_land"
     },
     {
-      "material_of": "minecraft:piston",
+      "material": "minecraft:piston",
       "sound": "minecraft:tile.piston.out"
     }
   ],

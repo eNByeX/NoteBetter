@@ -3,8 +3,11 @@ package com.github.soniex2.notebetter.util;
 import net.minecraft.util.ResourceLocation;
 import org.apache.commons.lang3.Validate;
 
+import javax.annotation.Nonnull;
+
 /**
  * A resource location with interned internals. Used to cut down object allocation.
+ *
  * @author soniex2
  */
 public class CachedResourceLocation extends ResourceLocation {
@@ -24,11 +27,11 @@ public class CachedResourceLocation extends ResourceLocation {
         hash = super.hashCode();
     }
 
-    public CachedResourceLocation(String p_i1293_1_) {
+    public CachedResourceLocation(@Nonnull String p_i1293_1_) {
         this(0, func_177516_a(p_i1293_1_));
     }
 
-    public CachedResourceLocation(String p_i1292_1_, String p_i1292_2_) {
+    public CachedResourceLocation(@Nonnull String p_i1292_1_, @Nonnull String p_i1292_2_) {
         this(0, p_i1292_1_, p_i1292_2_);
     }
 

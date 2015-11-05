@@ -1,6 +1,6 @@
 package com.github.soniex2.notebetter;
 
-import com.github.soniex2.notebetter.config.NoteBetterNoteConfig;
+import com.github.soniex2.notebetter.note.NoteBetterInstruments;
 import com.github.soniex2.notebetter.util.StreamHelper;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -11,16 +11,16 @@ import java.io.*;
 
 @Mod(modid = NoteBetter.MODID, name = "NoteBetter", version = NoteBetter.VERSION,
         acceptedMinecraftVersions = "1.8", acceptableRemoteVersions = "*",
-        guiFactory = "com.github.soniex2.notebetter.NoteBetterGuiFactory")
+        guiFactory = "com.github.soniex2.notebetter.gui.NoteBetterGuiFactory")
 public class NoteBetter {
     public static final String MODID = "notebetter";
-    public static final String VERSION = "0.2.0";
+    public static final String VERSION = "0.2.1";
 
     @Mod.Instance
     public static NoteBetter instance;
 
     public File nbConfigDir;
-    public NoteBetterNoteConfig defaultConfig;
+    public NoteBetterInstruments defaultConfig;
 
     public Logger log;
 
@@ -45,7 +45,7 @@ public class NoteBetter {
             }
             String contents = baos.toString("UTF-8");
             baos.close();
-            this.defaultConfig = NoteBetterNoteConfig.fromString(contents);
+            this.defaultConfig = NoteBetterInstruments.fromString(contents);
         } catch (IOException e) {
             throw new RuntimeException("Couldn't create NoteBetter config!", e);
         }

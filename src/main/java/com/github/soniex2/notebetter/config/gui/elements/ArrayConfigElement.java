@@ -1,4 +1,4 @@
-package com.github.soniex2.notebetter.config.elements;
+package com.github.soniex2.notebetter.config.gui.elements;
 
 import net.minecraft.client.resources.I18n;
 import net.minecraftforge.fml.client.config.ConfigGuiType;

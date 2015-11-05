@@ -1,4 +1,4 @@
-package com.github.soniex2.notebetter;
+package com.github.soniex2.notebetter.asm;
 
 import net.minecraftforge.fml.common.DummyModContainer;
 import net.minecraftforge.fml.common.ModMetadata;
@@ -13,18 +13,13 @@ import java.util.Map;
 @IFMLLoadingPlugin.TransformerExclusions("com.github.soniex2.notebetter")
 @IFMLLoadingPlugin.SortingIndex(Integer.MAX_VALUE)
 public class NoteBetterCore implements IFMLLoadingPlugin {
-    public static class NoteBetterCoreModContainer extends DummyModContainer {
-        public NoteBetterCoreModContainer(){
-            super(new ModMetadata());
-        }
-    }
     /**
      * @inheritDoc
      */
     @Override
     public String[] getASMTransformerClass() {
         return new String[] {
-                "com.github.soniex2.notebetter.NoteBetterClassTransformer"
+                "com.github.soniex2.notebetter.asm.NoteBetterClassTransformer"
         };
     }
 
@@ -33,7 +28,7 @@ public class NoteBetterCore implements IFMLLoadingPlugin {
      */
     @Override
     public String getModContainerClass() {
-        return null;//"com.github.soniex2.notebetter.NoteBetterCore$NoteBetterCoreModContainer";
+        return null;//"com.github.soniex2.notebetter.asm.NoteBetterCore$NoteBetterCoreModContainer";
     }
 
     /**

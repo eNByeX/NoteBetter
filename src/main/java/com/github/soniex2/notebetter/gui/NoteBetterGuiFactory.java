@@ -1,6 +1,6 @@
-package com.github.soniex2.notebetter;
+package com.github.soniex2.notebetter.gui;
 
-import com.github.soniex2.notebetter.config.NoteBetterConfigGuiScreen;
+import com.github.soniex2.notebetter.config.gui.NoteBetterConfigGuiScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiScreen;

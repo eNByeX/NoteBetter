@@ -20,7 +20,7 @@ plugins {
     id "net.minecraftforge.gradle.forge" version "2.0.1"
 }
 
-version = "0.2.0"
+version = "0.2.1"
 group= "com.github.soniex2.notebetter" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "notebetter"
 
@@ -39,7 +39,7 @@ minecraft {
 
 jar {
     manifest {
-        attributes 'FMLCorePlugin': 'com.github.soniex2.notebetter.NoteBetterCore'
+        attributes 'FMLCorePlugin': 'com.github.soniex2.notebetter.asm.NoteBetterCore'
         attributes 'FMLCorePluginContainsFMLMod': 'true'
     }
 }

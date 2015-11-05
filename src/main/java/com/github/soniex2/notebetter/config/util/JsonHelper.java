@@ -1,22 +1,21 @@
 package com.github.soniex2.notebetter.config.util;
 
-import com.google.gson.JsonElement;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonSyntaxException;
+import net.minecraft.util.JsonUtils;
 
 /**
  * @author soniex2
  */
 public class JsonHelper {
-    public static String getStringOrNull(JsonObject jsonObject, String key) {
+    public static JsonArray getJsonArrayOrNull(JsonObject jsonObject, String key) {
         if (jsonObject.has(key)) {
-            JsonElement value = jsonObject.get(key);
-            if (value.isJsonPrimitive())
-                return value.getAsString();
-            else if (value.isJsonNull())
+            if (jsonObject.isJsonNull()) {
                 return null;
-            throw new JsonSyntaxException(key + " must be string or null!");
+            }
+            return JsonUtils.getJsonElementAsJsonArray(jsonObject.get(key), key);
+        } else {
+            return null;
         }
-        return null;
     }
 }
