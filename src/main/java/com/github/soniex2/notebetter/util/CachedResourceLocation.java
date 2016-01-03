@@ -28,7 +28,7 @@ public class CachedResourceLocation extends ResourceLocation {
     }
 
     public CachedResourceLocation(@Nonnull String p_i1293_1_) {
-        this(0, func_177516_a(p_i1293_1_));
+        this(0, splitObjectName(p_i1293_1_));
     }
 
     public CachedResourceLocation(@Nonnull String p_i1292_1_, @Nonnull String p_i1292_2_) {

@@ -13,7 +13,7 @@ public class JsonHelper {
             if (jsonObject.isJsonNull()) {
                 return null;
             }
-            return JsonUtils.getJsonElementAsJsonArray(jsonObject.get(key), key);
+            return JsonUtils.getJsonArray(jsonObject.get(key), key);
         } else {
             return null;
         }

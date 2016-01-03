@@ -10,11 +10,11 @@ import org.apache.logging.log4j.Logger;
 import java.io.*;
 
 @Mod(modid = NoteBetter.MODID, name = "NoteBetter", version = NoteBetter.VERSION,
-        acceptedMinecraftVersions = "1.8", acceptableRemoteVersions = "*",
+        acceptedMinecraftVersions = "1.8.*", acceptableRemoteVersions = "*",
         guiFactory = "com.github.soniex2.notebetter.gui.NoteBetterGuiFactory")
 public class NoteBetter {
     public static final String MODID = "notebetter";
-    public static final String VERSION = "0.2.1";
+    public static final String VERSION = "0.2.2";
 
     @Mod.Instance
     public static NoteBetter instance;

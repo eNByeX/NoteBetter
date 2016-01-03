@@ -49,7 +49,7 @@ public class NoteBetterInstruments {
             // We already have a ResourceLocation, this is faster.
             Block b = null;
             if (Block.blockRegistry.containsKey(blockName)) {
-                b = (Block) Block.blockRegistry.getObject(blockName);
+                b = Block.blockRegistry.getObject(blockName);
             }
             if (b != null && b.getMaterial() == material) {
                 return ms.getInstrument();
@@ -66,7 +66,7 @@ public class NoteBetterInstruments {
      */
     @Nullable
     public NoteBetterInstrument getInstrumentForBlock(@Nonnull Block block) {
-        ResourceLocation rl = (ResourceLocation) Block.blockRegistry.getNameForObject(block);
+        ResourceLocation rl = Block.blockRegistry.getNameForObject(block);
         if (rl != null && blocks.containsKey(rl)) { // null check is an optimization
             return blocks.get(rl);
         }
@@ -120,7 +120,7 @@ public class NoteBetterInstruments {
                 } else {
                     throw new JsonSyntaxException("Invalid instrument: " + jsonElement);
                 }
-                volume = JsonUtils.getJsonObjectFloatFieldValueOrDefault(jsonObject, "volume", 3f);
+                volume = JsonUtils.getFloat(jsonObject, "volume", 3f);
             } else if (jsonElement.isJsonNull()) {
                 name = null;
                 volume = 3f;
@@ -146,8 +146,8 @@ public class NoteBetterInstruments {
                 JsonArray materials = JsonHelper.getJsonArrayOrNull(jsonObject, "materials");
                 if (blocks != null) {
                     for (JsonElement element : blocks) {
-                        JsonObject blockObject = JsonUtils.getElementAsJsonObject(element, "blocks");
-                        String block = JsonUtils.getJsonObjectStringFieldValue(blockObject, "block");
+                        JsonObject blockObject = JsonUtils.getJsonObject(element, "blocks");
+                        String block = JsonUtils.getString(blockObject, "block");
                         JsonElement soundElement = blockObject.get("sound");
                         if (soundElement == null) throw new JsonSyntaxException("Invalid instrument");
                         config.blocks.put(new CachedResourceLocation(block), getInstrument(soundElement));
@@ -155,12 +155,12 @@ public class NoteBetterInstruments {
                 }
                 if (materials != null) {
                     for (JsonElement element : materials) {
-                        JsonObject materialObject = JsonUtils.getElementAsJsonObject(element, "materials");
+                        JsonObject materialObject = JsonUtils.getJsonObject(element, "materials");
                         String block;
                         if (materialObject.has("material_of")) {
-                            block = JsonUtils.getJsonObjectStringFieldValue(materialObject, "material_of");
+                            block = JsonUtils.getString(materialObject, "material_of");
                         } else {
-                            block = JsonUtils.getJsonObjectStringFieldValue(materialObject, "material");
+                            block = JsonUtils.getString(materialObject, "material");
                         }
                         JsonElement soundElement = materialObject.get("sound");
                         if (soundElement == null) throw new JsonSyntaxException("Invalid instrument");

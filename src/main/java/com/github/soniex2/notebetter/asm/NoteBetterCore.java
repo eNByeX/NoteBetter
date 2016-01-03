@@ -9,7 +9,6 @@ import java.util.Map;
 /**
  * @author soniex2
  */
-@IFMLLoadingPlugin.MCVersion("1.8")
 @IFMLLoadingPlugin.TransformerExclusions("com.github.soniex2.notebetter")
 @IFMLLoadingPlugin.SortingIndex(Integer.MAX_VALUE)
 public class NoteBetterCore implements IFMLLoadingPlugin {
