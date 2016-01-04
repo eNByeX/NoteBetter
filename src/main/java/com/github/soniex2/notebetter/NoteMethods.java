@@ -1,5 +1,6 @@
 package com.github.soniex2.notebetter;
 
+import com.github.soniex2.notebetter.event.WorkaroundHandler;
 import com.github.soniex2.notebetter.note.NoteBetterInstrument;
 import com.github.soniex2.notebetter.note.NoteBetterInstruments;
 import com.github.soniex2.notebetter.util.EventHelper;
@@ -21,32 +22,7 @@ import net.minecraftforge.event.world.NoteBlockEvent;
 public class NoteMethods {
 
     private static void playNote(World world, BlockPos pos, ResourceLocation instrument, int note, float volume) {
-        // Our event
-        /*NoteBetterEvent.Play event = new NoteBetterEvent.Play(world, pos, world.getBlockState(pos), note, instrument);
-        if (MinecraftForge.EVENT_BUS.post(event)) return;
-        instrument = event.instrument;
-        note = event.getNote();*/
-
-        // Vanilla/Forge event
-        NoteBlockEvent.Instrument vanillaInstrument = EventHelper.instrumentFromResLoc(instrument);
-        if (vanillaInstrument != null) {
-            NoteBlockEvent.Play e = new NoteBlockEvent.Play(world, pos, world.getBlockState(pos), note, vanillaInstrument.ordinal());
-            if (MinecraftForge.EVENT_BUS.post(e)) return;
-            vanillaInstrument = e.instrument;
-            instrument = EventHelper.instrumentToResLoc(vanillaInstrument);
-            note = e.getVanillaNoteId();
-        }
-
-        // Calculate stuff
-        float pitch = (float) Math.pow(2.0, (note - 12) / 12.0);
-        double x = pos.getX() + .5;
-        double y = pos.getY() + .5;
-        double z = pos.getZ() + .5;
-
-        // Actually play
-        world.playSoundEffect(x, y, z, instrument.toString(), volume, pitch);
-        if (world instanceof WorldServer) // just in case it *isn't* being called from a WorldServer
-            ((WorldServer) world).spawnParticle(EnumParticleTypes.NOTE, false, x, y + .7, z, 0, note / 24.0, 0.0, 0.0, 1.0);
+        WorkaroundHandler.addNoteTickWorkaround(world, new WorkaroundHandler.NoteTickWorkaround(pos, volume, note, instrument));
     }
 
     private static boolean tryPlay(World world, BlockPos pos, NoteBetterInstrument instrument, int note) {

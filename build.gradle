@@ -20,7 +20,7 @@ plugins {
 }
 */
 
-version = "0.2.2"
+version = "0.2.3"
 group = "com.github.soniex2.notebetter" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "notebetter"
 
