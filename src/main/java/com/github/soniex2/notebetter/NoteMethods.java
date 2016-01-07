@@ -16,6 +16,8 @@ import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.world.NoteBlockEvent;
 
+import java.util.logging.Logger;
+
 /**
  * @author soniex2
  */
@@ -37,6 +39,7 @@ public class NoteMethods {
 
     public static boolean handleTileEntity(World world, BlockPos pos) {
         if (world.getBlockState(pos.up()).getBlock().getMaterial() == Material.air) {
+            //NoteBetter.instance.log.info("PLAYNOTE: " + world.getWorldTime());
             if (!(world.getTileEntity(pos) instanceof TileEntityNote)) return false;
 
             TileEntityNote te = ((TileEntityNote) world.getTileEntity(pos));
