@@ -1,6 +1,5 @@
-package com.github.soniex2.notebetter.event;
+package com.github.soniex2.notebetter;
 
-import com.github.soniex2.notebetter.NoteBetter;
 import com.github.soniex2.notebetter.util.EventHelper;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumParticleTypes;
@@ -9,16 +8,13 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.world.NoteBlockEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
-import net.minecraftforge.fml.relauncher.Side;
 
 import java.util.*;
 
 /**
  * @author soniex2
  */
-public class WorkaroundHandler {
+public class Workarounds {
     public static class NoteTickWorkaround {
         private final BlockPos pos;
         private int note;
@@ -47,7 +43,6 @@ public class WorkaroundHandler {
         }
 
         public void play(World world) {
-            NoteBetter.instance.log.info("PLAY: " + world.getWorldTime());
             // Our event
             /*NoteBetterEvent.Play event = new NoteBetterEvent.Play(world, pos, world.getBlockState(pos), note, instrument);
             if (MinecraftForge.EVENT_BUS.post(event)) return;
@@ -74,7 +69,6 @@ public class WorkaroundHandler {
             world.playSoundEffect(x, y, z, instrument.toString(), volume, pitch);
             if (world instanceof WorldServer) // just in case it *isn't* being called from a WorldServer
                 ((WorldServer) world).spawnParticle(EnumParticleTypes.NOTE, false, x, y + .7, z, 0, note / 24.0, 0.0, 0.0, 1.0);
-            //NoteBetter.instance.log.info("PLAYWORKAROUND: " + world.getWorldTime());
         }
     }
 
@@ -90,25 +84,11 @@ public class WorkaroundHandler {
         data.add(workaround);
     }
 
-    /*@SubscribeEvent
-    public void onWorldTick(TickEvent.WorldTickEvent event) {
-        if (event.phase == TickEvent.Phase.END && event.type == TickEvent.Type.WORLD && event.side == Side.SERVER) {
-            NoteTickWorkaroundWorldData data = map.get(event.world);
-            if (data == null) return;
-            data.sendQueuedBlockEvents(event.world);
-        }
-    }*/
-
     // This needs to happen between the start of the tick and TileEntity updates, but also after block ticks.
     public static void sendNoteUpdates(World world) {
         NoteTickWorkaroundWorldData data = map.get(world);
         if (data == null) return;
         data.sendQueuedBlockEvents(world);
-    }
-
-    @SubscribeEvent
-    public void onNotePlay(NoteBlockEvent.Play event) {
-        if (!event.world.isRemote) NoteBetter.instance.log.info("PLAYEVENT: " + event.world.getWorldTime());
     }
 
     private static class NoteTickWorkaroundWorldData {

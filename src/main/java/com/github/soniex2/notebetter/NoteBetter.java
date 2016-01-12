@@ -1,9 +1,7 @@
 package com.github.soniex2.notebetter;
 
-import com.github.soniex2.notebetter.event.WorkaroundHandler;
 import com.github.soniex2.notebetter.note.NoteBetterInstruments;
 import com.github.soniex2.notebetter.util.StreamHelper;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -16,7 +14,7 @@ import java.io.*;
         guiFactory = "com.github.soniex2.notebetter.gui.NoteBetterGuiFactory")
 public class NoteBetter {
     public static final String MODID = "notebetter";
-    public static final String VERSION = "0.2.4";
+    public static final String VERSION = "0.2.5";
 
     @Mod.Instance
     public static NoteBetter instance;
@@ -116,7 +114,5 @@ public class NoteBetter {
 
         loadGlobalConfigs();
         unpackExamples();
-
-        MinecraftForge.EVENT_BUS.register(new WorkaroundHandler());
     }
 }

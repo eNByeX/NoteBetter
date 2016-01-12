@@ -1,22 +1,14 @@
 package com.github.soniex2.notebetter;
 
-import com.github.soniex2.notebetter.event.WorkaroundHandler;
 import com.github.soniex2.notebetter.note.NoteBetterInstrument;
 import com.github.soniex2.notebetter.note.NoteBetterInstruments;
-import com.github.soniex2.notebetter.util.EventHelper;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.tileentity.TileEntityNote;
 import net.minecraft.util.BlockPos;
-import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.world.NoteBlockEvent;
-
-import java.util.logging.Logger;
 
 /**
  * @author soniex2
@@ -24,7 +16,7 @@ import java.util.logging.Logger;
 public class NoteMethods {
 
     private static void playNote(World world, BlockPos pos, ResourceLocation instrument, int note, float volume) {
-        WorkaroundHandler.addNoteTickWorkaround(world, new WorkaroundHandler.NoteTickWorkaround(pos, volume, note, instrument));
+        Workarounds.addNoteTickWorkaround(world, new Workarounds.NoteTickWorkaround(pos, volume, note, instrument));
     }
 
     private static boolean tryPlay(World world, BlockPos pos, NoteBetterInstrument instrument, int note) {
@@ -39,7 +31,6 @@ public class NoteMethods {
 
     public static boolean handleTileEntity(World world, BlockPos pos) {
         if (world.getBlockState(pos.up()).getBlock().getMaterial() == Material.air) {
-            //NoteBetter.instance.log.info("PLAYNOTE: " + world.getWorldTime());
             if (!(world.getTileEntity(pos) instanceof TileEntityNote)) return false;
 
             TileEntityNote te = ((TileEntityNote) world.getTileEntity(pos));
