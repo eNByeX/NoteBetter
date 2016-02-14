@@ -20,7 +20,7 @@ import java.io.*;
 
 @Mod(modid = NoteBetter.MODID, name = "NoteBetter", version = NoteBetter.VERSION,
      acceptedMinecraftVersions = "1.8.*", acceptableRemoteVersions = "*",
-     guiFactory = "NoteBetterGuiFactory")
+     guiFactory = "com.github.soniex2.notebetter.gui.NoteBetterGuiFactory")
 public class NoteBetter implements NoteBetterAPIInstance {
     public static final String MODID = "notebetter";
     public static final String VERSION = "0.2.5";

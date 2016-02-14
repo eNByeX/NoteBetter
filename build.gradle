@@ -48,7 +48,7 @@ minecraft {
 
 jar {
     manifest {
-        attributes 'FMLCorePlugin': 'NoteBetterCore'
+        attributes 'FMLCorePlugin': 'com.github.soniex2.notebetter.asm.NoteBetterCore'
         attributes 'FMLCorePluginContainsFMLMod': 'true'
     }
 }
