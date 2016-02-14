@@ -1,5 +1,6 @@
 package com.github.soniex2.notebetter.note;
 
+import com.github.soniex2.notebetter.api.NoteBetterInstrument;
 import net.minecraft.util.ResourceLocation;
 
 import javax.annotation.Nonnull;

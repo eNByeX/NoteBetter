@@ -1,7 +1,5 @@
 package com.github.soniex2.notebetter.asm;
 
-import net.minecraftforge.fml.common.DummyModContainer;
-import net.minecraftforge.fml.common.ModMetadata;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 
 import java.util.Map;
@@ -27,7 +25,7 @@ public class NoteBetterCore implements IFMLLoadingPlugin {
      */
     @Override
     public String getModContainerClass() {
-        return null;//"com.github.soniex2.notebetter.asm.NoteBetterCore$NoteBetterCoreModContainer";
+        return null;//"NoteBetterCore$NoteBetterCoreModContainer";
     }
 
     /**

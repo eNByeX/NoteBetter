@@ -130,7 +130,7 @@ public class NoteBetterClassTransformer implements IClassTransformer {
                     VarInsnNode vigetWorld = new VarInsnNode(Opcodes.ALOAD, 0);
                     it.add(vigetWorld);
                     MethodInsnNode call = new MethodInsnNode(Opcodes.INVOKESTATIC,
-                                                             "com/github/soniex2/notebetter/event/WorkaroundHandler",
+                                                             "com/github/soniex2/notebetter/Workarounds",
                                                              "sendNoteUpdates",
                                                              maps.get("nm_ws_hook_desc"),
                                                              false);

@@ -1,10 +1,8 @@
-package com.github.soniex2.notebetter.note;
+package com.github.soniex2.notebetter.api;
 
-import com.google.gson.*;
 import net.minecraft.util.ResourceLocation;
 
 import javax.annotation.Nullable;
-import java.lang.reflect.Type;
 
 /**
  * @author soniex2

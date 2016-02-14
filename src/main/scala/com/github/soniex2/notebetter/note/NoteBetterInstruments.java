@@ -1,11 +1,13 @@
 package com.github.soniex2.notebetter.note;
 
 import com.github.soniex2.notebetter.NoteBetter;
+import com.github.soniex2.notebetter.api.NoteBetterInstrument;
 import com.github.soniex2.notebetter.config.util.JsonHelper;
 import com.github.soniex2.notebetter.util.CachedResourceLocation;
 import com.google.gson.*;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.JsonUtils;
 import net.minecraft.util.ResourceLocation;
 
@@ -20,10 +22,10 @@ import java.util.Map;
 /**
  * @author soniex2
  */
-public class NoteBetterInstruments {
+class NoteBetterInstruments {
     @Nullable
     protected NoteBetterInstrument defaultInstrument = null;
-    protected Map<ResourceLocation, NoteBetterInstrument> blocks = new LinkedHashMap<ResourceLocation, NoteBetterInstrument>();
+    protected Map<ResourceLocation, InstrumentBlock> blocks = new LinkedHashMap<ResourceLocation, InstrumentBlock>();
     protected List<MaterialSound> materials = new ArrayList<MaterialSound>();
 
     /**
@@ -65,10 +67,10 @@ public class NoteBetterInstruments {
      * @return {@literal null} if the given block has no instrument assigned to it, or the assigned instrument otherwise.
      */
     @Nullable
-    public NoteBetterInstrument getInstrumentForBlock(@Nonnull Block block) {
+    public NoteBetterInstrument getInstrumentForBlock(@Nonnull Block block, IBlockState state) {
         ResourceLocation rl = Block.blockRegistry.getNameForObject(block);
         if (rl != null && blocks.containsKey(rl)) { // null check is an optimization
-            return blocks.get(rl);
+            return blocks.get(rl).get(state);
         }
         return null;
     }
@@ -97,7 +99,7 @@ public class NoteBetterInstruments {
 
     /* JSON (DE)SERIALIZER */
 
-    public static class Serializer implements JsonDeserializer, JsonSerializer {
+    public static class Serializer implements JsonDeserializer<NoteBetterInstruments>, JsonSerializer<NoteBetterInstruments> {
 
         @Nonnull
         private NoteBetterInstrument getInstrument(@Nonnull JsonElement jsonElement) {
@@ -134,7 +136,7 @@ public class NoteBetterInstruments {
          * @inheritDoc
          */
         @Override
-        public Object deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+        public NoteBetterInstruments deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             JsonObject jsonObject = json.getAsJsonObject();
             NoteBetterInstruments config = new NoteBetterInstruments();
             try {
@@ -142,15 +144,17 @@ public class NoteBetterInstruments {
                 if (defaultSoundElement != null && !defaultSoundElement.isJsonNull()) {
                     config.defaultInstrument = getInstrument(defaultSoundElement);
                 }
-                JsonArray blocks = JsonHelper.getJsonArrayOrNull(jsonObject, "blocks");
-                JsonArray materials = JsonHelper.getJsonArrayOrNull(jsonObject, "materials");
+                JsonArray blocks = null;//JsonHelper.optJsonArray(jsonObject, "blocks");
+                JsonArray materials = null;//JsonHelper.optJsonArray(jsonObject, "materials");
                 if (blocks != null) {
                     for (JsonElement element : blocks) {
                         JsonObject blockObject = JsonUtils.getJsonObject(element, "blocks");
                         String block = JsonUtils.getString(blockObject, "block");
                         JsonElement soundElement = blockObject.get("sound");
                         if (soundElement == null) throw new JsonSyntaxException("Invalid instrument");
-                        config.blocks.put(new CachedResourceLocation(block), getInstrument(soundElement));
+                        InstrumentBlock is = new InstrumentBlock();
+                        is.addPredicate(null, getInstrument(soundElement));// TODO read predicates
+                        config.blocks.put(new CachedResourceLocation(block), is);
                     }
                 }
                 if (materials != null) {
@@ -189,8 +193,7 @@ public class NoteBetterInstruments {
          * @inheritDoc
          */
         @Override
-        public JsonElement serialize(Object src, Type typeOfSrc, JsonSerializationContext context) {
-            NoteBetterInstruments config = (NoteBetterInstruments) src;
+        public JsonElement serialize(NoteBetterInstruments config, Type typeOfSrc, JsonSerializationContext context) {
             JsonObject jsonObject = new JsonObject();
             if (config.defaultInstrument != null) {
                 jsonObject.add("default", toSoundObject(config.defaultInstrument));
@@ -203,10 +206,10 @@ public class NoteBetterInstruments {
                 materialObject.add("sound", toSoundObject(sound.getInstrument()));
                 materials.add(materialObject);
             }
-            for (Map.Entry<ResourceLocation, NoteBetterInstrument> sound : config.blocks.entrySet()) {
+            for (Map.Entry<ResourceLocation, InstrumentBlock> sound : config.blocks.entrySet()) {
                 JsonObject blockObject = new JsonObject();
                 blockObject.addProperty("block", sound.getKey().toString());
-                blockObject.add("sound", toSoundObject(sound.getValue()));
+                //blockObject.add("sound", toSoundObject(sound.getValue())); // TODO
                 blocks.add(blockObject);
             }
             jsonObject.add("materials", materials);

@@ -1,18 +1,27 @@
 package com.github.soniex2.notebetter;
 
-import com.github.soniex2.notebetter.note.NoteBetterInstruments;
+import com.github.soniex2.notebetter.api.NoteBetterAPI;
+import com.github.soniex2.notebetter.api.NoteBetterAPIInstance;
+import com.github.soniex2.notebetter.api.NoteBetterInstrument;
+import com.github.soniex2.notebetter.note.InstrumentRegistry;
 import com.github.soniex2.notebetter.util.StreamHelper;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
+import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import org.apache.logging.log4j.Logger;
 
+import javax.annotation.Nullable;
 import java.io.*;
 
 @Mod(modid = NoteBetter.MODID, name = "NoteBetter", version = NoteBetter.VERSION,
-        acceptedMinecraftVersions = "1.8.*", acceptableRemoteVersions = "*",
-        guiFactory = "com.github.soniex2.notebetter.gui.NoteBetterGuiFactory")
-public class NoteBetter {
+     acceptedMinecraftVersions = "1.8.*", acceptableRemoteVersions = "*",
+     guiFactory = "NoteBetterGuiFactory")
+public class NoteBetter implements NoteBetterAPIInstance {
     public static final String MODID = "notebetter";
     public static final String VERSION = "0.2.5";
 
@@ -20,9 +29,25 @@ public class NoteBetter {
     public static NoteBetter instance;
 
     public File nbConfigDir;
-    public NoteBetterInstruments defaultConfig;
+    public InstrumentRegistry activeConfig;
+    public InstrumentRegistry globalConfig;
 
     public Logger log;
+
+    @Override
+    public NoteBetterInstrument getInstrument(IBlockAccess worldTarget, BlockPos blockPosTarget, IBlockAccess worldSource, BlockPos blockPosSource) {
+        return activeConfig.getInstrument(worldTarget, blockPosTarget, worldSource, blockPosSource);
+    }
+
+    @Override
+    public NoteBetterInstrument getInstrument(IBlockState blockState, @Nullable TileEntity tileEntity) {
+        return activeConfig.getInstrument(blockState, tileEntity);
+    }
+
+    @Override
+    public NoteBetterInstrument getInstrument(ItemStack itemStack) {
+        return activeConfig.getInstrument(itemStack);
+    }
 
     private void loadGlobalConfigs() {
         File defaultConfig = new File(nbConfigDir, "default.json");
@@ -45,7 +70,8 @@ public class NoteBetter {
             }
             String contents = baos.toString("UTF-8");
             baos.close();
-            this.defaultConfig = NoteBetterInstruments.fromString(contents);
+            this.activeConfig = InstrumentRegistry.fromString(contents);
+            // TODO parse
         } catch (IOException e) {
             throw new RuntimeException("Couldn't create NoteBetter config!", e);
         }
@@ -106,6 +132,8 @@ public class NoteBetter {
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
+        NoteBetterAPI.init(this);
+
         log = event.getModLog();
 
         nbConfigDir = new File(event.getModConfigurationDirectory(), "notebetter");
