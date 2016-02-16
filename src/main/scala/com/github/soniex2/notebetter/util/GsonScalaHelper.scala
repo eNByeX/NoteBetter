@@ -53,10 +53,15 @@ object GsonScalaHelper {
     }
   }
 
-  final case class WJsonObject(jsonObject: JsonObject) extends WJsonElement {
+  final case class WJsonObject(jsonObject: JsonObject) extends WJsonElement with Iterable[(String, Option[WJsonElement])] {
     @inline def has(name: String) = jsonObject.has(name)
 
     @inline def get(name: String) = Option(jsonObject.get(name)) flatMap WJsonElement
+
+    // iterable for convenience
+    override def iterator: Iterator[(String, Option[WJsonElement])] = {
+      jsonObject.entrySet().iterator().asScala.map((v) => (v.getKey, Option(v.getValue) flatMap WJsonElement))
+    }
   }
 
   //final case class WJsonNull() extends WJsonElement // this wrapper prefers None

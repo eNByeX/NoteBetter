@@ -22,7 +22,7 @@ plugins {
 }
 */
 
-version = "0.2.5"
+version = "1.0.0"
 group = "com.github.soniex2.notebetter" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "notebetter"
 
@@ -34,7 +34,7 @@ runServer {
 }
 
 minecraft {
-    version = "1.8.9-11.15.0.1715"
+    version = "1.8.9-11.15.1.1747"
     runDir = "run"
 
     // the mappings can be changed at any time, and must be in the following format.

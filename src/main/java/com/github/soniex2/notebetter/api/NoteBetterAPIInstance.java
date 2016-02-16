@@ -19,4 +19,6 @@ public interface NoteBetterAPIInstance {
     NoteBetterInstrument getInstrument(IBlockState blockState, @Nullable TileEntity tileEntity);
 
     NoteBetterInstrument getInstrument(ItemStack itemStack);
+
+    boolean isNoteBetterInstrument(String s);
 }

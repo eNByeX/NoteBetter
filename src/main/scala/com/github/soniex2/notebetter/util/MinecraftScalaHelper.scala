@@ -1,6 +1,8 @@
 package com.github.soniex2.notebetter.util
 
-import net.minecraft.util.{BlockPos, ResourceLocation}
+import com.google.common.base.Predicate
+import net.minecraft.block.state.IBlockState
+import net.minecraft.util.{BlockPos, RegistryNamespacedDefaultedByKey, ResourceLocation}
 
 /**
   * @author soniex2
@@ -27,6 +29,12 @@ object MinecraftScalaHelper {
     def unapply(blockPos: BlockPos): Option[(Int, Int, Int)] = {
       Some((blockPos.getX, blockPos.getY, blockPos.getZ))
     }
+  }
+
+  implicit class RegNamespacedDefaultedByKey[K, V](reg: RegistryNamespacedDefaultedByKey[K, V]) {
+    def byKey(k: K) = Option(reg.getObject(k))
+
+    def byVal(v: V) = Option(reg.getNameForObject(v))
   }
 
 }

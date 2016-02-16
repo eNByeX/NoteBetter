@@ -7,6 +7,8 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 
+import javax.annotation.Nullable;
+
 /**
  * @author soniex2
  */
@@ -63,7 +65,7 @@ public class NoteBetterAPI {
      * @param tileEntity The tile entity.
      * @return The instrument associated with the block, or {@code null} if no instrument is associated with the block.
      */
-    public static NoteBetterInstrument getInstrument(Block block, IBlockState blockState, TileEntity tileEntity) {
+    public static NoteBetterInstrument getInstrument(Block block, IBlockState blockState, @Nullable TileEntity tileEntity) {
         return instance.getInstrument(blockState, tileEntity);
     }
 
@@ -76,4 +78,11 @@ public class NoteBetterAPI {
     public static NoteBetterInstrument getInstrument(ItemStack is) {
         return instance.getInstrument(is);
     }
+
+    /**
+     * EXPERIMENTAL: Checks if the given string is a valid/registered instrument.
+     * @param s The string.
+     * @return {@code true} if the given string is known to be a NoteBetter instrument.
+     */
+    boolean isNoteBetterInstrument(String s) { return instance.isNoteBetterInstrument(s); }
 }

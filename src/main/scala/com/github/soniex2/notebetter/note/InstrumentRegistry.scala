@@ -5,34 +5,56 @@ import com.github.soniex2.notebetter.api.{NoteBetterAPIInstance, NoteBetterInstr
 import com.github.soniex2.notebetter.config.util.JsonHelper
 import com.github.soniex2.notebetter.util.GsonScalaHelper._
 import com.github.soniex2.notebetter.util.MinecraftScalaHelper._
-import com.google.common.base.Predicates
+import com.github.soniex2.notebetter.util.OrderingHelper._
 import com.google.gson._
 import net.minecraft.block.Block.blockRegistry
+import net.minecraft.block.material.Material
 import net.minecraft.block.state.IBlockState
 import net.minecraft.item.ItemStack
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.{BlockPos, ResourceLocation}
 import net.minecraft.world.IBlockAccess
 
+import scala.collection.immutable.{TreeMap, TreeSet}
+
 /**
   * @author soniex2
   */
 class InstrumentRegistry(defaultInstrument: Option[NoteBetterInstrument],
                          blocks: Map[ResourceLocation, InstrumentBlock],
-                         materials: List[MaterialSound]) extends NoteBetterAPIInstance {
+                         materials: List[MaterialSound],
+                         known: Set[String]) extends NoteBetterAPIInstance {
 
   override def getInstrument(worldTarget: IBlockAccess, blockPosTarget: BlockPos, worldSource: IBlockAccess, blockPosSource: BlockPos): NoteBetterInstrument = {
     getInstrument(worldTarget.getBlockState(blockPosTarget), worldTarget.getTileEntity(blockPosTarget))
   }
 
-  override def getInstrument(blockState: IBlockState, tileEntity: TileEntity): NoteBetterInstrument = {
-    val tile = Option(tileEntity)
-    val block = blockState.getBlock
-    Option(blockRegistry.getNameForObject(block)).flatMap(blocks.get).flatMap((v) => Option(v.get(blockState))).orElse(materials.find((v) => Option(blockRegistry.getObject(v.getBlockName)).map(_.getMaterial).contains(block.getMaterial)).map(_.getInstrument)).orElse(defaultInstrument).orNull
+  def getBlockInstrument(blockState: IBlockState, tileEntity: Option[TileEntity]): Option[NoteBetterInstrument] = {
+    for {
+      block <- blockRegistry.byVal(blockState.getBlock)
+      blockInstrument <- blocks.get(block)
+      instrument <- blockInstrument.get(blockState)
+    } yield instrument
   }
 
-  override def getInstrument(itemStack: ItemStack): NoteBetterInstrument = null
+  def getMaterialInstrument(material: Material): Option[NoteBetterInstrument] = {
+    materials.find((v) => blockRegistry.byKey(v.getBlockName).map(_.getMaterial).contains(material)).map(_.getInstrument)
+  }
 
+  override def getInstrument(blockState: IBlockState, tileEntity: TileEntity): NoteBetterInstrument = {
+    val tile = Option(tileEntity) // TODO 1.1+
+    getBlockInstrument(blockState, tile) // Try blocks
+      .orElse(getMaterialInstrument(blockState.getBlock.getMaterial)) // Try materials
+      .orElse(defaultInstrument).orNull // Try default and convert to java.
+  }
+
+  override def getInstrument(itemStack: ItemStack): NoteBetterInstrument = null // TODO 1.1+
+
+  override def toString = {
+    blocks.toString()
+  }
+
+  override def isNoteBetterInstrument(s: String): Boolean = known.contains(s)
 }
 
 object InstrumentRegistry {
@@ -40,14 +62,14 @@ object InstrumentRegistry {
 
   def fromString(s: String): InstrumentRegistry = {
     if (s.length == 0) {
-      new InstrumentRegistry(None, Map.empty, List.empty)
+      new InstrumentRegistry(None, Map.empty, List.empty, Set.empty)
     } else {
       try {
         JSON_ADAPTER.fromJson(s, classOf[InstrumentRegistry])
       }
       catch {
         case exception: Exception =>
-          new InstrumentRegistry(None, Map.empty, List.empty)
+          new InstrumentRegistry(None, Map.empty, List.empty, Set.empty)
       }
     }
   }
@@ -71,8 +93,29 @@ object InstrumentRegistry {
       new NoteBetterInstrument((name map CachedResourceLocation).orNull, volume getOrElse 3f)
     }
 
-    private def readVariants(element: Option[WJsonElement]) = {
-      // TODO
+    private def readVariants(obj: WJsonObject): InstrumentBlock = {
+      // TODO optimize for 1.1+
+      val states = for {
+        statesElem <- obj.get("states")
+        statesArr <- statesElem.asJsonArray
+      } yield statesArr.flatMap((x) => {
+        x.flatMap(_.asJsonObject).map((o) => {
+          val variant: TreeMap[String, TreeSet[String]] = o.get("variant").flatMap(_.asJsonObject).map((variant) => {
+            val m = TreeMap.empty[String, TreeSet[String]] ++ variant.map({
+              case (k, v) =>
+              val opt = v collect {
+                case e@WJsonArray(_) => e.flatMap(_.flatMap(_.asJsonString).map(_.string)).to[TreeSet]
+                case WJsonString(s) => TreeSet(s)
+              }
+              (k, opt.getOrElse(TreeSet.empty[String]))
+            }).toList
+            m
+          }).getOrElse(TreeMap.empty)
+          val sound = getInstrument(o.get("sound"))
+          (variant, sound)
+        })
+      }).toList
+      new InstrumentBlock(states.getOrElse(List.empty))
     }
 
     private def readBlock(element: Option[WJsonElement]): Option[(ResourceLocation, InstrumentBlock)] = {
@@ -81,11 +124,9 @@ object InstrumentRegistry {
         blockNameElem <- blockObject get "block"
         blockName <- blockNameElem.asJsonString
       } yield {
-        // TODO
-        if (!blockObject.has("sound")) throw new JsonSyntaxException("Invalid instrument")
-        val soundElement = blockObject get "sound"
-        val is: InstrumentBlock = new InstrumentBlock
-        is.addPredicate(Predicates.alwaysTrue(), getInstrument(soundElement)) // TODO
+        val is: InstrumentBlock = readVariants(blockObject)
+        if (blockObject.has("sound"))
+          is.addPredicate(TreeMap.empty, getInstrument(blockObject get "sound"))
         (CachedResourceLocation(blockName.string), is)
       }
     }
@@ -108,13 +149,19 @@ object InstrumentRegistry {
         val defaultInstrument = jsonObject get "default" map (e => getInstrument(Some(e)))
         val blocks = JsonHelper.optJsonArray(jsonObject, "blocks") map (_.flatMap(readBlock).toMap) getOrElse Map.empty
         val materials = JsonHelper.optJsonArray(jsonObject, "materials") map (_.flatMap(readMaterial).toList) getOrElse List.empty
-        return new InstrumentRegistry(defaultInstrument, blocks, materials)
+
+        // build instrument set
+        val fromBlocks = blocks.values.flatMap(_.predicates.map(_._2)).flatMap((v) => Option(v.getSoundEvent)).map(_.toString)
+        val fromMaterials = materials.flatMap((v) => Option(v.getInstrument.getSoundEvent)).map(_.toString)
+        val fromDefault = defaultInstrument.flatMap((v) => Option(v.getSoundEvent)).map(_.toString)
+        val instruments = fromBlocks.toSet ++ fromMaterials ++ fromDefault
+
+        new InstrumentRegistry(defaultInstrument, blocks, materials, instruments)
       }
       catch {
-        case e: Exception => {
+        case e: Exception =>
           NoteBetter.instance.log.error("Error decoding config file", e)
-          return new InstrumentRegistry(None, Map.empty, List.empty)
-        }
+          new InstrumentRegistry(None, Map.empty, List.empty, Set.empty)
       }
     }
 
@@ -128,6 +175,7 @@ object InstrumentRegistry {
     }
 
     override def serialize(config: InstrumentRegistry, typeOfSrc: java.lang.reflect.Type, context: JsonSerializationContext): JsonElement = {
+      // TODO 1.1+
       /*val jsonObject: JsonObject = new JsonObject
       if (config.defaultInstrument != null) {
         jsonObject.add("default", toSoundObject(config.defaultInstrument))
@@ -148,7 +196,7 @@ object InstrumentRegistry {
       jsonObject.add("materials", materials)
       jsonObject.add("blocks", blocks)
       return jsonObject*/
-      return new JsonObject
+      new JsonObject
     }
   }
 
