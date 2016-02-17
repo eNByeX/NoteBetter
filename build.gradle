@@ -46,11 +46,20 @@ minecraft {
     makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
 }
 
+def commonManifest = {
+    attributes 'FMLCorePlugin': 'com.github.soniex2.notebetter.asm.NoteBetterCore'
+    attributes 'FMLCorePluginContainsFMLMod': 'true'
+}
+
 jar {
-    manifest {
-        attributes 'FMLCorePlugin': 'com.github.soniex2.notebetter.asm.NoteBetterCore'
-        attributes 'FMLCorePluginContainsFMLMod': 'true'
+    manifest commonManifest
+}
+
+task deobfJar(type: Jar) {
+    from(sourceSets.main.output) {
+        classifier = "deobf"
     }
+    manifest commonManifest
 }
 
 dependencies {
