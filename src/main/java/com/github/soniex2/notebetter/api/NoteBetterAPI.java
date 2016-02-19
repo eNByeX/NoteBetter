@@ -84,5 +84,7 @@ public class NoteBetterAPI {
      * @param s The string.
      * @return {@code true} if the given string is known to be a NoteBetter instrument.
      */
-    boolean isNoteBetterInstrument(String s) { return instance.isNoteBetterInstrument(s); }
+    public static boolean isNoteBetterInstrument(String s) {
+        return instance.isNoteBetterInstrument(s);
+    }
 }
