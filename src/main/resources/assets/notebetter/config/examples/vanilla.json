@@ -5,34 +5,34 @@
     {
       "material": "minecraft:stone",
       "sound": {
-        "name": "minecraft:note.bd",
+        "name": "minecraft:block.note.basedrum",
         "volume": 3.0
       }
     },
     {
       "material": "minecraft:sand",
       "sound": {
-        "name": "minecraft:note.snare",
+        "name": "minecraft:block.note.snare",
         "volume": 3.0
       }
     },
     {
       "material": "minecraft:glass",
       "sound": {
-        "name": "minecraft:note.hat",
+        "name": "minecraft:block.note.hat",
         "volume": 3.0
       }
     },
     {
       "material": "minecraft:planks",
       "sound": {
-        "name": "minecraft:note.bassattack",
+        "name": "minecraft:block.note.bass",
         "volume": 3.0
       }
     }
   ],
   "default": {
-    "name": "minecraft:note.harp",
+    "name": "minecraft:block.note.harp",
     "volume": 3.0
   }
 }

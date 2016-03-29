@@ -3,14 +3,14 @@
     {
       "block": "minecraft:enchanting_table",
       "sound": {
-        "name": "minecraft:random.orb",
+        "name": "minecraft:entity.experience_orb.touch",
         "volume": 3.0
       }
     },
     {
       "block": "minecraft:brewing_stand",
       "sound": {
-        "name": "minecraft:random.pop",
+        "name": "minecraft:entity.chicken.egg",
         "volume": 3.0
       }
     }
@@ -19,21 +19,28 @@
     {
       "material": "minecraft:iron_block",
       "sound": {
-        "name": "minecraft:note.pling",
+        "name": "minecraft:block.note.pling",
         "volume": 3.0
       }
     },
     {
       "material": "minecraft:anvil",
       "sound": {
-        "name": "minecraft:random.anvil_land",
+        "name": "minecraft:block.anvil.land",
         "volume": 3.0
       }
     },
     {
       "material": "minecraft:piston",
       "sound": {
-        "name": "minecraft:tile.piston.out",
+        "name": "minecraft:block.piston.extend",
+        "volume": 3.0
+      }
+    },
+    {
+      "material": "minecraft:torch",
+      "sound": {
+        "name": "minecraft:block.redstone_torch.burnout",
         "volume": 3.0
       }
     }
