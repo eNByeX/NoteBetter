@@ -10,9 +10,11 @@ import com.google.gson._
 import net.minecraft.block.Block.blockRegistry
 import net.minecraft.block.material.Material
 import net.minecraft.block.state.IBlockState
+import net.minecraft.init.SoundEvents
 import net.minecraft.item.ItemStack
 import net.minecraft.tileentity.TileEntity
-import net.minecraft.util.{BlockPos, ResourceLocation}
+import net.minecraft.util.math.BlockPos
+import net.minecraft.util.{SoundEvent, ResourceLocation}
 import net.minecraft.world.IBlockAccess
 
 import scala.collection.immutable.{TreeMap, TreeSet}
@@ -38,23 +40,19 @@ class InstrumentRegistry(defaultInstrument: Option[NoteBetterInstrument],
   }
 
   def getMaterialInstrument(material: Material): Option[NoteBetterInstrument] = {
-    materials.find((v) => blockRegistry.byKey(v.getBlockName).map(_.getMaterial).contains(material)).map(_.getInstrument)
+    materials.find((v) => blockRegistry.byKey(v.blockName).map(_.getDefaultState.getMaterial).contains(material)).map(_.instrument())
   }
 
   override def getInstrument(blockState: IBlockState, tileEntity: TileEntity): NoteBetterInstrument = {
     val tile = Option(tileEntity) // TODO 1.1+
     getBlockInstrument(blockState, tile) // Try blocks
-      .orElse(getMaterialInstrument(blockState.getBlock.getMaterial)) // Try materials
+      .orElse(getMaterialInstrument(blockState.getMaterial)) // Try materials
       .orElse(defaultInstrument).orNull // Try default and convert to java.
   }
 
   override def getInstrument(itemStack: ItemStack): NoteBetterInstrument = null // TODO 1.1+
 
-  override def toString = {
-    blocks.toString()
-  }
-
-  override def isNoteBetterInstrument(s: String): Boolean = known.contains(s)
+  override def isNoteBetterInstrument(s: String): Boolean = known.contains(new ResourceLocation(s).toString)
 }
 
 object InstrumentRegistry {
@@ -90,7 +88,14 @@ object InstrumentRegistry {
         volElem <- obj get "volume"
         volNum <- volElem.asJsonNumber
       } yield volNum.floatValue
-      new NoteBetterInstrument((name map CachedResourceLocation).orNull, volume getOrElse 3f)
+      val soundEvent = for {
+        v <- name
+        event <- Option(SoundEvent.soundEventRegistry.getObject(new ResourceLocation(v))).orElse({
+          NoteBetter.instance.log.warn(s"Unknown sound event: $v")
+          None
+        })
+      } yield event
+      new NoteBetterInstrument(soundEvent.orNull, volume getOrElse 3f)
     }
 
     private def readVariants(obj: WJsonObject): InstrumentBlock = {
@@ -151,9 +156,9 @@ object InstrumentRegistry {
         val materials = JsonHelper.optJsonArray(jsonObject, "materials") map (_.flatMap(readMaterial).toList) getOrElse List.empty
 
         // build instrument set
-        val fromBlocks = blocks.values.flatMap(_.predicates.map(_._2)).flatMap((v) => Option(v.getSoundEvent)).map(_.toString)
-        val fromMaterials = materials.flatMap((v) => Option(v.getInstrument.getSoundEvent)).map(_.toString)
-        val fromDefault = defaultInstrument.flatMap((v) => Option(v.getSoundEvent)).map(_.toString)
+        val fromBlocks = blocks.values.flatMap(_.predicates.map(_._2)).flatMap((v) => Option(v.soundEvent())).map(_.toString)
+        val fromMaterials = materials.flatMap((v) => Option(v.instrument().soundEvent())).map(_.getSoundName.toString)
+        val fromDefault = defaultInstrument.flatMap((v) => Option(v.soundEvent())).map(_.getSoundName.toString)
         val instruments = fromBlocks.toSet ++ fromMaterials ++ fromDefault
 
         new InstrumentRegistry(defaultInstrument, blocks, materials, instruments)
@@ -167,10 +172,10 @@ object InstrumentRegistry {
 
     private def toSoundObject(instrument: NoteBetterInstrument): JsonObject = {
       val jsonObject: JsonObject = new JsonObject
-      jsonObject.add("name", Option(instrument.getSoundEvent).map((x) => {
-        new JsonPrimitive(x.toString)
+      jsonObject.add("name", Option(instrument.soundEvent()).map((x) => {
+        new JsonPrimitive(x.getSoundName.toString)
       }).orNull)
-      jsonObject.addProperty("volume", instrument.getVolume)
+      jsonObject.addProperty("volume", instrument.volume())
       jsonObject
     }
 

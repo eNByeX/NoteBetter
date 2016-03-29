@@ -1,6 +1,7 @@
 package com.github.soniex2.notebetter.api;
 
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundEvent;
 
 import javax.annotation.Nullable;
 
@@ -9,20 +10,20 @@ import javax.annotation.Nullable;
  */
 public class NoteBetterInstrument {
     @Nullable
-    protected final ResourceLocation soundEvent;
+    protected final SoundEvent soundEvent;
     protected final float volume;
 
-    public NoteBetterInstrument(@Nullable ResourceLocation soundEvent, float volume) {
+    public NoteBetterInstrument(@Nullable SoundEvent soundEvent, float volume) {
         this.soundEvent = soundEvent;
         this.volume = volume;
     }
 
-    public float getVolume() {
+    public float volume() {
         return volume;
     }
 
     @Nullable
-    public ResourceLocation getSoundEvent() {
+    public SoundEvent soundEvent() {
         return soundEvent;
     }
 }

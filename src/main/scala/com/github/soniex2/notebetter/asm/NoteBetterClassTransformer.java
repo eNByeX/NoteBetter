@@ -24,8 +24,8 @@ public class NoteBetterClassTransformer implements IClassTransformer {
         maps = new HashMap<String, String>();
         /*TileEntityNote*/
         maps.put("te_mname", "triggerNote");
-        maps.put("te_mdesc", "(Lnet/minecraft/world/World;Lnet/minecraft/util/BlockPos;)V");
-        maps.put("nm_te_hndlr_desc", "(Lnet/minecraft/world/World;Lnet/minecraft/util/BlockPos;)Z");
+        maps.put("te_mdesc", "(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)V");
+        maps.put("nm_te_hndlr_desc", "(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)Z");
         /*WorldServer*/
         maps.put("ws_mname", "sendQueuedBlockEvents");
         maps.put("ws_mdesc", "()V");
@@ -36,8 +36,8 @@ public class NoteBetterClassTransformer implements IClassTransformer {
         maps = new HashMap<String, String>();
         /*TileEntityNote*/
         maps.put("te_mname", "func_175108_a");
-        maps.put("te_mdesc", "(Lnet/minecraft/world/World;Lnet/minecraft/util/BlockPos;)V");
-        maps.put("nm_te_hndlr_desc", "(Lnet/minecraft/world/World;Lnet/minecraft/util/BlockPos;)Z");
+        maps.put("te_mdesc", "(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)V");
+        maps.put("nm_te_hndlr_desc", "(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)Z");
         /*WorldServer*/
         maps.put("ws_mname", "func_147488_Z");
         maps.put("ws_mdesc", "()V");
@@ -126,6 +126,15 @@ public class NoteBetterClassTransformer implements IClassTransformer {
             for (MethodNode m : classNode.methods) {
                 if (m.name.equals(maps.get("ws_mname")) && m.desc.equals(maps.get("ws_mdesc"))) {
                     ListIterator<AbstractInsnNode> it = m.instructions.iterator();
+
+                    while (it.hasNext()) { // find implicit RETURN
+                        if (it.next().getOpcode() == Opcodes.RETURN) {
+                            it.previous();
+                            break;
+                        }
+                    }
+                    if (!it.hasNext()) throw new IllegalStateException("???"); // what?!
+
                     System.out.println("Transforming WorldServer.sendQueuedBlockEvents");
                     VarInsnNode vigetWorld = new VarInsnNode(Opcodes.ALOAD, 0);
                     it.add(vigetWorld);

@@ -8,7 +8,7 @@ import com.github.soniex2.notebetter.util.StreamHelper;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -18,8 +18,7 @@ import org.apache.logging.log4j.Logger;
 import javax.annotation.Nullable;
 import java.io.*;
 
-@Mod(modid = NoteBetter.MODID, name = "NoteBetter", version = NoteBetter.VERSION,
-     acceptedMinecraftVersions = "1.8.*", acceptableRemoteVersions = "*",
+@Mod(modid = NoteBetter.MODID, name = "NoteBetter", version = NoteBetter.VERSION, acceptableRemoteVersions = "*",
      guiFactory = "com.github.soniex2.notebetter.gui.NoteBetterGuiFactory")
 public class NoteBetter implements NoteBetterAPIInstance {
     public static final String MODID = "notebetter";
@@ -75,8 +74,7 @@ public class NoteBetter implements NoteBetterAPIInstance {
             }
             String contents = baos.toString("UTF-8");
             baos.close();
-            this.activeConfig = InstrumentRegistry.fromString(contents);
-            log.info(activeConfig.toString());
+            this.globalConfig = this.activeConfig = InstrumentRegistry.fromString(contents);
         } catch (IOException e) {
             throw new RuntimeException("Couldn't create NoteBetter config!", e);
         }

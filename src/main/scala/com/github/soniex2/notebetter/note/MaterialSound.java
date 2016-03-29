@@ -20,12 +20,12 @@ public class MaterialSound {
     }
 
     @Nonnull
-    public ResourceLocation getBlockName() {
+    public ResourceLocation blockName() {
         return blockName;
     }
 
     @Nonnull
-    public NoteBetterInstrument getInstrument() {
+    public NoteBetterInstrument instrument() {
         return instrument;
     }
 }

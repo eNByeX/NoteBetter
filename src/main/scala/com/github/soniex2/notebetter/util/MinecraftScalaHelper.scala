@@ -1,8 +1,8 @@
 package com.github.soniex2.notebetter.util
 
-import com.google.common.base.Predicate
-import net.minecraft.block.state.IBlockState
-import net.minecraft.util.{BlockPos, RegistryNamespacedDefaultedByKey, ResourceLocation}
+import net.minecraft.util.math.BlockPos
+import net.minecraft.util.registry.RegistryNamespacedDefaultedByKey
+import net.minecraft.util.ResourceLocation
 
 /**
   * @author soniex2
