@@ -1,10 +1,10 @@
 package com.github.soniex2.notebetter;
 
+import com.github.soniex2.notebetter.api.ISoundEvent;
 import com.github.soniex2.notebetter.api.NoteBetterAPI;
 import com.github.soniex2.notebetter.api.NoteBetterInstrument;
 import net.minecraft.block.material.Material;
 import net.minecraft.tileentity.TileEntityNote;
-import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -19,7 +19,7 @@ public class NoteMethods {
 
     private static boolean tryPlay(World world, BlockPos pos, NoteBetterInstrument instrument, int note) {
         if (instrument != null) {
-            SoundEvent sound = instrument.soundEvent();
+            ISoundEvent sound = instrument.iSoundEvent();
             if (sound == null) return true; // don't play anything
             playNote(world, pos, instrument, note);
             return true;

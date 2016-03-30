@@ -17,8 +17,8 @@ public class NoteBetterPlayEvent extends NoteBlockEvent.Play {
         private static final String RESDOM = "minecraft";
         private static final String PREFIX = "block.note.";
 
-        public static NoteBlockEvent.Instrument instrumentFromSoundEvent(SoundEvent soundEvent) {
-            ResourceLocation instrument = soundEvent.getSoundName();
+        public static NoteBlockEvent.Instrument instrumentFromSoundEvent(ISoundEvent soundEvent) {
+            ResourceLocation instrument = soundEvent.asResourceLocation();
             if (instrument.getResourceDomain().equals(RESDOM) && instrument.getResourcePath().startsWith(PREFIX)) {
                 String name = instrument.getResourcePath().substring(PREFIX.length()); // skip above prefix
                 switch (name.charAt(0)) {
@@ -43,11 +43,11 @@ public class NoteBetterPlayEvent extends NoteBlockEvent.Play {
             return Instrument.PIANO;
         }
 
-        private static final NoteBetterInstrument NB_PIANO = new NoteBetterInstrument(SoundEvents.block_note_harp, 3f);
-        private static final NoteBetterInstrument NB_BASS_DRUM = new NoteBetterInstrument(SoundEvents.block_note_basedrum, 3f);
-        private static final NoteBetterInstrument NB_SNARE = new NoteBetterInstrument(SoundEvents.block_note_snare, 3f);
-        private static final NoteBetterInstrument NB_CLICKS = new NoteBetterInstrument(SoundEvents.block_note_hat, 3f);
-        private static final NoteBetterInstrument NB_DOUBLE_BASS = new NoteBetterInstrument(SoundEvents.block_note_bass, 3f);
+        private static final NoteBetterInstrument NB_PIANO = new NoteBetterInstrument(new RegisteredSoundEvent(SoundEvents.block_note_harp), 3f);
+        private static final NoteBetterInstrument NB_BASS_DRUM = new NoteBetterInstrument(new RegisteredSoundEvent(SoundEvents.block_note_basedrum), 3f);
+        private static final NoteBetterInstrument NB_SNARE = new NoteBetterInstrument(new RegisteredSoundEvent(SoundEvents.block_note_snare), 3f);
+        private static final NoteBetterInstrument NB_CLICKS = new NoteBetterInstrument(new RegisteredSoundEvent(SoundEvents.block_note_hat), 3f);
+        private static final NoteBetterInstrument NB_DOUBLE_BASS = new NoteBetterInstrument(new RegisteredSoundEvent(SoundEvents.block_note_bass), 3f);
 
         public static NoteBetterInstrument instrumentToNB(NoteBlockEvent.Instrument instrument) {
             switch (instrument) {
@@ -68,7 +68,7 @@ public class NoteBetterPlayEvent extends NoteBlockEvent.Play {
     private NoteBetterInstrument noteBetterInstrument;
 
     public NoteBetterPlayEvent(World world, BlockPos pos, IBlockState state, int note, NoteBetterInstrument instrument) {
-        super(world, pos, state, note, EventHelper.instrumentFromSoundEvent(instrument.soundEvent()).ordinal());
+        super(world, pos, state, note, EventHelper.instrumentFromSoundEvent(instrument.iSoundEvent()).ordinal());
         this.noteBetterInstrument = instrument;
     }
 
@@ -78,7 +78,7 @@ public class NoteBetterPlayEvent extends NoteBlockEvent.Play {
 
     public void noteBetterInstrument(NoteBetterInstrument instrument) {
         this.noteBetterInstrument = instrument;
-        super.setInstrument(EventHelper.instrumentFromSoundEvent(instrument.soundEvent()));
+        super.setInstrument(EventHelper.instrumentFromSoundEvent(instrument.iSoundEvent()));
     }
 
     public void setInstrument(Instrument instrument) {

@@ -22,7 +22,7 @@ import java.io.*;
      guiFactory = "com.github.soniex2.notebetter.gui.NoteBetterGuiFactory")
 public class NoteBetter implements NoteBetterAPIInstance {
     public static final String MODID = "notebetter";
-    public static final String VERSION = "1.0.1";
+    public static final String VERSION = "1.1.0";
 
     @Mod.Instance
     public static NoteBetter instance;

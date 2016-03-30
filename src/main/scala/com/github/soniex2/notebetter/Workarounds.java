@@ -4,9 +4,7 @@ import com.github.soniex2.notebetter.api.NoteBetterInstrument;
 import com.github.soniex2.notebetter.api.NoteBetterPlayEvent;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.MinecraftForge;
 
 import java.util.*;
@@ -28,7 +26,7 @@ public class Workarounds {
 
         @Override
         public int hashCode() {
-            return (((note * 31 + Float.floatToIntBits(instrument.volume())) * 31 + instrument.hashCode()) * 31 + pos.hashCode()) * 31;
+            return ((note * 31 + instrument.hashCode()) * 31 + pos.hashCode()) * 31;
         }
 
         @Override
@@ -36,7 +34,7 @@ public class Workarounds {
             if (this == other) return true;
             if (!(other instanceof NoteTickWorkaround)) return false;
             NoteTickWorkaround ntw = (NoteTickWorkaround) other;
-            /* optimization, saves storage space */
+            /* optimization */
             return ntw.pos.equals(pos) ? ntw.note == note ? ntw.instrument.equals(instrument) : false : false;
         }
 
@@ -57,17 +55,8 @@ public class Workarounds {
                 note = e.getVanillaNoteId();
             }*/
 
-            // Calculate stuff
-            float pitch = (float) Math.pow(2.0, (note - 12) / 12.0);
-            double x = pos.getX() + .5;
-            double y = pos.getY() + .5;
-            double z = pos.getZ() + .5;
-
-            // Actually play
-            //world.playSoundEffect(x, y, z, instrument.soundEvent(), instrument.volume(), pitch);
-            world.playSound(null, pos, instrument.soundEvent(), SoundCategory.RECORDS, instrument.volume(), pitch);
-            if (world instanceof WorldServer) // just in case it *isn't* being called from a WorldServer
-                ((WorldServer) world).spawnParticle(EnumParticleTypes.NOTE, false, x, y + .7, z, 0, note / 24.0, 0.0, 0.0, 1.0);
+            // Finally play
+            instrument.iSoundEvent().play(world, pos, SoundCategory.RECORDS, instrument.volume(), note);
         }
     }
 
