@@ -65,7 +65,7 @@ public class Workarounds {
 
             // Actually play
             //world.playSoundEffect(x, y, z, instrument.soundEvent(), instrument.volume(), pitch);
-            world.playSound(null, pos, instrument.soundEvent(), SoundCategory.BLOCKS, instrument.volume(), pitch);
+            world.playSound(null, pos, instrument.soundEvent(), SoundCategory.RECORDS, instrument.volume(), pitch);
             if (world instanceof WorldServer) // just in case it *isn't* being called from a WorldServer
                 ((WorldServer) world).spawnParticle(EnumParticleTypes.NOTE, false, x, y + .7, z, 0, note / 24.0, 0.0, 0.0, 1.0);
         }
