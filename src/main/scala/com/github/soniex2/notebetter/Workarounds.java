@@ -2,6 +2,7 @@ package com.github.soniex2.notebetter;
 
 import com.github.soniex2.notebetter.api.NoteBetterInstrument;
 import com.github.soniex2.notebetter.api.NoteBetterPlayEvent;
+import com.github.soniex2.notebetter.api.soundevent.IAdvancedSoundEvent;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -56,7 +57,7 @@ public class Workarounds {
             }*/
 
             // Finally play
-            instrument.iSoundEvent().play(world, pos, SoundCategory.RECORDS, instrument.volume(), note);
+            new IAdvancedSoundEvent.Wrapper(instrument.soundEvent()).play(world, pos, SoundCategory.RECORDS, instrument.volume(), note);
         }
     }
 

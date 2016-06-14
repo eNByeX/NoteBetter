@@ -1,25 +1,25 @@
-package com.github.soniex2.notebetter.api;
+package com.github.soniex2.notebetter.api.soundevent;
 
 import com.google.common.base.Objects;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.play.server.SPacketCustomSound;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorldEventListener;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
+import net.minecraftforge.event.world.NoteBlockEvent;
 
 /**
  * @author soniex2
  */
 public class CustomSoundEvent implements ISoundEvent {
     private final ResourceLocation soundEvent;
+    private final NoteBlockEvent.Instrument vanillaInstrument;
 
-    public CustomSoundEvent(ResourceLocation soundEvent) {
+    public CustomSoundEvent(ResourceLocation soundEvent, NoteBlockEvent.Instrument vanillaInstrument) {
         this.soundEvent = soundEvent;
+        this.vanillaInstrument = vanillaInstrument;
     }
 
     @Override
@@ -38,6 +38,11 @@ public class CustomSoundEvent implements ISoundEvent {
     @Override
     public ResourceLocation asResourceLocation() {
         return soundEvent;
+    }
+
+    @Override
+    public NoteBlockEvent.Instrument asVanillaInstrument() {
+        return vanillaInstrument;
     }
 
     @Override

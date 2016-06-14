@@ -5,6 +5,7 @@ import com.github.soniex2.notebetter.api.NoteBetterAPIInstance;
 import com.github.soniex2.notebetter.api.NoteBetterInstrument;
 import com.github.soniex2.notebetter.note.InstrumentRegistry;
 import com.github.soniex2.notebetter.util.StreamHelper;
+import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -16,34 +17,41 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.*;
 
 @Mod(modid = NoteBetter.MODID, name = "NoteBetter", version = NoteBetter.VERSION, acceptableRemoteVersions = "*",
      guiFactory = "com.github.soniex2.notebetter.gui.NoteBetterGuiFactory")
+@MethodsReturnNonnullByDefault
+@ParametersAreNonnullByDefault
 public class NoteBetter implements NoteBetterAPIInstance {
     public static final String MODID = "notebetter";
-    public static final String VERSION = "1.1.0";
+    public static final String VERSION = "2.0.0";
 
     @Mod.Instance
     public static NoteBetter instance;
 
+    public Logger log;
     public File nbConfigDir;
+
+    /* START NoteBetterAPIInstance */
     public InstrumentRegistry activeConfig;
     public InstrumentRegistry globalConfig;
 
-    public Logger log;
-
     @Override
-    public NoteBetterInstrument getInstrument(IBlockAccess worldTarget, BlockPos blockPosTarget, IBlockAccess worldSource, BlockPos blockPosSource) {
-        return activeConfig.getInstrument(worldTarget, blockPosTarget, worldSource, blockPosSource);
+    @Nullable
+    public NoteBetterInstrument getInstrument(IBlockAccess worldInst, BlockPos blockPosInst, IBlockAccess worldNB, BlockPos blockPosNB) {
+        return activeConfig.getInstrument(worldInst, blockPosInst, worldNB, blockPosNB);
     }
 
     @Override
+    @Nullable
     public NoteBetterInstrument getInstrument(IBlockState blockState, @Nullable TileEntity tileEntity) {
         return activeConfig.getInstrument(blockState, tileEntity);
     }
 
     @Override
+    @Nullable
     public NoteBetterInstrument getInstrument(ItemStack itemStack) {
         return activeConfig.getInstrument(itemStack);
     }
@@ -52,6 +60,7 @@ public class NoteBetter implements NoteBetterAPIInstance {
     public boolean isNoteBetterInstrument(String s) {
         return activeConfig.isNoteBetterInstrument(s);
     }
+    /* END NoteBetterAPIInstance */
 
     private void loadGlobalConfigs() {
         File defaultConfig = new File(nbConfigDir, "default.json");

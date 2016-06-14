@@ -1,13 +1,13 @@
 package com.github.soniex2.notebetter.util
 
-import net.minecraft.util.math.BlockPos
 import net.minecraft.util.registry.RegistryNamespacedDefaultedByKey
-import net.minecraft.util.ResourceLocation
 
 /**
   * @author soniex2
   */
 object MinecraftScalaHelper {
+
+  type ResourceLocation = net.minecraft.util.ResourceLocation
 
   object ResourceLocation extends (String => ResourceLocation) with ((String, String) => ResourceLocation) {
     @inline override def apply(v1: String) = new ResourceLocation(v1)
@@ -22,6 +22,8 @@ object MinecraftScalaHelper {
 
     @inline override def apply(v1: String, v2: String) = new CachedResourceLocation(v1, v2)
   }
+
+  type BlockPos = net.minecraft.util.math.BlockPos
 
   object BlockPos extends ((Int, Int, Int) => BlockPos) {
     @inline override def apply(x: Int, y: Int, z: Int) = new BlockPos(x, y, z)

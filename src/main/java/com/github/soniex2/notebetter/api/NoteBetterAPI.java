@@ -1,6 +1,5 @@
 package com.github.soniex2.notebetter.api;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -28,6 +27,7 @@ public class NoteBetterAPI {
      * @param blockPos The block position.
      * @return The instrument associated with the block, or {@code null} if no instrument is associated with the block.
      */
+    @Nullable
     public static NoteBetterInstrument getInstrument(World world, BlockPos blockPos) {
         return instance.getInstrument(world, blockPos, world, blockPos.up());
     }
@@ -36,36 +36,37 @@ public class NoteBetterAPI {
      * Retrieves the instrument for the block and tile entity in the given World and BlockPos, relative to the
      * consumer's World and BlockPos. This method is used for inter-world instrument retrieval.
      *
-     * @param worldTarget    The target's world.
-     * @param blockPosTarget The target's block position.
-     * @param worldSource    The consumer's world.
-     * @param blockPosSource The consumer's block position.
+     * @param worldInst    The target's world.
+     * @param blockPosInst The target's block position.
+     * @param worldNB      The consumer's world.
+     * @param blockPosNB   The consumer's block position.
      * @return The instrument associated with the block, or {@code null} if no instrument is associated with the block.
      */
-    public static NoteBetterInstrument getInstrument(World worldTarget, BlockPos blockPosTarget, World worldSource, BlockPos blockPosSource) {
-        return instance.getInstrument(worldTarget, blockPosTarget, worldSource, blockPosSource);
+    @Nullable
+    public static NoteBetterInstrument getInstrument(World worldInst, BlockPos blockPosInst, World worldNB, BlockPos blockPosNB) {
+        return instance.getInstrument(worldInst, blockPosInst, worldNB, blockPosNB);
     }
 
     /**
      * Retrieves the instrument for the given block and block state.
      *
-     * @param block      The block.
      * @param blockState The block state.
      * @return The instrument associated with the block, or {@code null} if no instrument is associated with the block.
      */
-    public static NoteBetterInstrument getInstrument(Block block, IBlockState blockState) {
+    @Nullable
+    public static NoteBetterInstrument getInstrument(IBlockState blockState) {
         return instance.getInstrument(blockState, null);
     }
 
     /**
      * Retrieves the instrument for the given block, block state and tile entity.
      *
-     * @param block      The block.
      * @param blockState The block state.
      * @param tileEntity The tile entity.
      * @return The instrument associated with the block, or {@code null} if no instrument is associated with the block.
      */
-    public static NoteBetterInstrument getInstrument(Block block, IBlockState blockState, @Nullable TileEntity tileEntity) {
+    @Nullable
+    public static NoteBetterInstrument getInstrument(IBlockState blockState, @Nullable TileEntity tileEntity) {
         return instance.getInstrument(blockState, tileEntity);
     }
 
@@ -75,6 +76,7 @@ public class NoteBetterAPI {
      * @param is The ItemStack.
      * @return The instrument associated with the item, or {@code null} if no instrument is associated with the item.
      */
+    @Nullable
     public static NoteBetterInstrument getInstrument(ItemStack is) {
         return instance.getInstrument(is);
     }

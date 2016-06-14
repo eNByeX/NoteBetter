@@ -1,9 +1,8 @@
 package com.github.soniex2.notebetter.api;
 
+import com.github.soniex2.notebetter.api.soundevent.ISoundEvent;
 import com.google.common.base.Objects;
-import net.minecraft.init.SoundEvents;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundEvent;
+import net.minecraftforge.event.world.NoteBlockEvent;
 
 import javax.annotation.Nullable;
 
@@ -15,12 +14,6 @@ public class NoteBetterInstrument {
     protected final ISoundEvent soundEvent;
     protected final float volume;
 
-    @Deprecated
-    public NoteBetterInstrument(@Nullable SoundEvent soundEvent, float volume) {
-        this.soundEvent = new RegisteredSoundEvent(soundEvent);
-        this.volume = volume;
-    }
-
     public NoteBetterInstrument(@Nullable ISoundEvent soundEvent, float volume) {
         this.soundEvent = soundEvent;
         this.volume = volume;
@@ -31,14 +24,17 @@ public class NoteBetterInstrument {
     }
 
     @Nullable
-    @Deprecated
-    public SoundEvent soundEvent() {
-        return soundEvent == null ? null : SoundEvent.soundEventRegistry.getObject(soundEvent.asResourceLocation());
+    public ISoundEvent soundEvent() {
+        return soundEvent;
     }
 
-    @Nullable
-    public ISoundEvent iSoundEvent() {
-        return soundEvent;
+    public NoteBlockEvent.Instrument asVanillaInstrument() {
+        ISoundEvent se = soundEvent();
+        if (se != null) {
+            return se.asVanillaInstrument();
+        } else {
+            return NoteBlockEvent.Instrument.PIANO;
+        }
     }
 
     @Override

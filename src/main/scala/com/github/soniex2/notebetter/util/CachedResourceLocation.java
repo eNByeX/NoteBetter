@@ -10,7 +10,7 @@ import javax.annotation.Nonnull;
  *
  * @author soniex2
  */
-public class CachedResourceLocation extends ResourceLocation {
+public final class CachedResourceLocation extends ResourceLocation {
     private static String[] filter(String... data) {
         String resourceDomain = org.apache.commons.lang3.StringUtils.isEmpty(data[0]) ? "minecraft" : data[0].toLowerCase();
         String resourcePath = data[1];
@@ -18,10 +18,10 @@ public class CachedResourceLocation extends ResourceLocation {
         return new String[]{resourceDomain.intern(), resourcePath.intern()};
     }
 
-    protected final String str;
-    protected final int hash;
+    private final String str;
+    private final int hash;
 
-    protected CachedResourceLocation(int p_i45928_1_, String... resourcePathIn) {
+    private CachedResourceLocation(int p_i45928_1_, String... resourcePathIn) {
         super(p_i45928_1_, filter(resourcePathIn));
         str = super.toString().intern();
         hash = super.hashCode();
@@ -36,6 +36,7 @@ public class CachedResourceLocation extends ResourceLocation {
     }
 
     @Override
+    @Nonnull
     public String toString() {
         return str;
     }
@@ -44,11 +45,11 @@ public class CachedResourceLocation extends ResourceLocation {
     public boolean equals(Object other) {
         if (this == other) {
             return true;
-        } else if (!(other instanceof CachedResourceLocation)) {
-            return super.equals(other);
-        } else {
+        } else if (other instanceof CachedResourceLocation) {
             CachedResourceLocation rl = (CachedResourceLocation) other;
             return this.str.equals(rl.str);
+        } else {
+            return super.equals(other);
         }
     }
 

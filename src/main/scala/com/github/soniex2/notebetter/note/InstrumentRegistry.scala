@@ -1,19 +1,23 @@
 package com.github.soniex2.notebetter.note
 
-import com.github.soniex2.notebetter.NoteBetter
-import com.github.soniex2.notebetter.api.{CustomSoundEvent, RegisteredSoundEvent, NoteBetterAPIInstance, NoteBetterInstrument}
+
+import com.github.soniex2.notebetter.api.soundevent.{CustomSoundEvent, RegisteredSoundEvent}
+import com.github.soniex2.notebetter.api.{NoteBetterAPIInstance, NoteBetterInstrument}
 import com.github.soniex2.notebetter.config.util.JsonHelper
+import com.github.soniex2.notebetter.util.EventHelper
 import com.github.soniex2.notebetter.util.GsonScalaHelper._
 import com.github.soniex2.notebetter.util.MinecraftScalaHelper._
+import com.github.soniex2.notebetter.{NoteBetter, VanillaFallbackSoundEvent}
+
 //import com.github.soniex2.notebetter.util.OrderingHelper._
 import com.google.gson._
-import net.minecraft.block.Block.blockRegistry
+import net.minecraft.block.Block.{REGISTRY => blockRegistry}
 import net.minecraft.block.material.Material
 import net.minecraft.block.state.IBlockState
 import net.minecraft.item.ItemStack
 import net.minecraft.tileentity.TileEntity
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.{SoundEvent, ResourceLocation}
+//import net.minecraft.util.math.BlockPos
+import net.minecraft.util.SoundEvent
 import net.minecraft.world.IBlockAccess
 
 import scala.collection.immutable.{TreeMap, TreeSet}
@@ -43,15 +47,16 @@ class InstrumentRegistry(defaultInstrument: Option[NoteBetterInstrument],
   }
 
   override def getInstrument(blockState: IBlockState, tileEntity: TileEntity): NoteBetterInstrument = {
-    val tile = Option(tileEntity) // TODO 1.2+
+    val tile = Option(tileEntity) // TODO 2.1+
     getBlockInstrument(blockState, tile) // Try blocks
       .orElse(getMaterialInstrument(blockState.getMaterial)) // Try materials
-      .orElse(defaultInstrument).orNull // Try default and convert to java.
+      .orElse(defaultInstrument) // Try default
+      .orNull // Convert to java.
   }
 
-  override def getInstrument(itemStack: ItemStack): NoteBetterInstrument = null // TODO 1.2+
+  override def getInstrument(itemStack: ItemStack): NoteBetterInstrument = null // TODO 2.1+
 
-  override def isNoteBetterInstrument(s: String): Boolean = known.contains(new ResourceLocation(s).toString)
+  override def isNoteBetterInstrument(s: String): Boolean = known.contains(ResourceLocation(s).toString)
 }
 
 object InstrumentRegistry {
@@ -87,19 +92,25 @@ object InstrumentRegistry {
         volElem <- obj get "volume"
         volNum <- volElem.asJsonNumber
       } yield volNum.floatValue
+      // TODO vanilla NoteBlockEvent.Instrument override
       val soundEvent = for {
         v <- name
-        event <- Option(SoundEvent.soundEventRegistry.getObject(new ResourceLocation(v))).map(new RegisteredSoundEvent(_)).orElse({
-          NoteBetter.instance.log.warn(s"Unknown sound event: $v. Interpreting as custom sound.")
-          // TODO hooks?!
-          Option(new CustomSoundEvent(new ResourceLocation(v)))
+        event <- Option(SoundEvent.REGISTRY.getObject(ResourceLocation(v))).map(new RegisteredSoundEvent(_)).orElse({
+          if (ResourceLocation(v).equals(VanillaFallbackSoundEvent.RESLOC)) {
+            Option(VanillaFallbackSoundEvent.INSTANCE)
+          } else {
+            NoteBetter.instance.log.warn(s"Unknown sound event: $v. Interpreting as custom sound.")
+            // TODO hooks?!
+            Option(new CustomSoundEvent(ResourceLocation(v), EventHelper.instrumentFromResLoc(ResourceLocation(v))))
+          }
         })
       } yield event
       new NoteBetterInstrument(soundEvent.orNull, volume getOrElse 3f)
     }
 
     private def readVariants(obj: WJsonObject): InstrumentBlock = {
-      // TODO optimize for 1.2+
+      // TODO optimize for 2.1+
+      // TODO modify for use with materials (1.9+ has per-state material)
       val states = for {
         statesElem <- obj.get("states")
         statesArr <- statesElem.asJsonArray
@@ -108,11 +119,11 @@ object InstrumentRegistry {
           val variant: TreeMap[String, TreeSet[String]] = o.get("variant").flatMap(_.asJsonObject).map((variant) => {
             val m = TreeMap.empty[String, TreeSet[String]] ++ variant.map({
               case (k, v) =>
-              val opt = v collect {
-                case e@WJsonArray(_) => e.flatMap(_.flatMap(_.asJsonString).map(_.string)).to[TreeSet]
-                case WJsonString(s) => TreeSet(s)
-              }
-              (k, opt.getOrElse(TreeSet.empty[String]))
+                val opt = v collect {
+                  case e@WJsonArray(_) => e.flatMap(_.flatMap(_.asJsonString).map(_.string)).to[TreeSet]
+                  case WJsonString(s) => TreeSet(s)
+                }
+                (k, opt.getOrElse(TreeSet.empty[String]))
             }).toList
             m
           }).getOrElse(TreeMap.empty)
@@ -156,9 +167,9 @@ object InstrumentRegistry {
         val materials = JsonHelper.optJsonArray(jsonObject, "materials") map (_.flatMap(readMaterial).toList) getOrElse List.empty
 
         // build instrument set
-        val fromBlocks = blocks.values.flatMap(_.predicates.map(_._2)).flatMap((v) => Option(v.iSoundEvent())).map(_.toString)
-        val fromMaterials = materials.flatMap((v) => Option(v.instrument().iSoundEvent())).map(_.toString)
-        val fromDefault = defaultInstrument.flatMap((v) => Option(v.iSoundEvent())).map(_.toString)
+        val fromBlocks = blocks.values.flatMap(_.predicates.map(_._2)).flatMap((v) => Option(v.soundEvent())).map(_.toString)
+        val fromMaterials = materials.flatMap((v) => Option(v.instrument().soundEvent())).map(_.toString)
+        val fromDefault = defaultInstrument.flatMap((v) => Option(v.soundEvent())).map(_.toString)
         val instruments = fromBlocks.toSet ++ fromMaterials ++ fromDefault
 
         new InstrumentRegistry(defaultInstrument, blocks, materials, instruments)
@@ -172,7 +183,7 @@ object InstrumentRegistry {
 
     private def toSoundObject(instrument: NoteBetterInstrument): JsonObject = {
       val jsonObject: JsonObject = new JsonObject
-      jsonObject.add("name", Option(instrument.iSoundEvent()).map((x) => {
+      jsonObject.add("name", Option(instrument.soundEvent()).map((x) => {
         new JsonPrimitive(x.toString)
       }).orNull)
       jsonObject.addProperty("volume", instrument.volume())
@@ -180,7 +191,7 @@ object InstrumentRegistry {
     }
 
     override def serialize(config: InstrumentRegistry, typeOfSrc: java.lang.reflect.Type, context: JsonSerializationContext): JsonElement = {
-      // TODO 1.2+
+      // TODO 2.1+
       /*val jsonObject: JsonObject = new JsonObject
       if (config.defaultInstrument != null) {
         jsonObject.add("default", toSoundObject(config.defaultInstrument))
