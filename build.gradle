@@ -34,7 +34,7 @@ runServer {
 }*/
 
 minecraft {
-    version = "1.9.4-12.17.0.1960"
+    version = "1.10-12.18.0.1986-1.10.0"
     runDir = "run"
 
     // the mappings can be changed at any time, and must be in the following format.
