@@ -1,7 +1,7 @@
 /**
  * @author soniex2
  */
-@API(owner = "notebetter", provides = "notebetter|api", apiVersion = "2.0.0")
+@API(owner = "notebetter", provides = "notebetter|api", apiVersion = "2.0.1")
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 package com.github.soniex2.notebetter.api;

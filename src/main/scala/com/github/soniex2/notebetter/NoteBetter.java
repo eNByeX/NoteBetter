@@ -26,7 +26,7 @@ import java.io.*;
 @ParametersAreNonnullByDefault
 public class NoteBetter implements NoteBetterAPIInstance {
     public static final String MODID = "notebetter";
-    public static final String VERSION = "2.0.0";
+    public static final String VERSION = "2.0.1";
 
     @Mod.Instance
     public static NoteBetter instance;
