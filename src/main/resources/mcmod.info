@@ -2,7 +2,7 @@
 {
   "modid": "notebetter",
   "name": "NoteBetter",
-  "description": "Better Note Blocks. 1.10 Fork by ShinkoNet.",
+  "description": "Better Note Blocks. 1.10.2 Fork by ShinkoNet.",
   "version": "${version}",
   "mcversion": "${mcversion}",
   "url": "",
